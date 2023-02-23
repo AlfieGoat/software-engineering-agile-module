@@ -29,8 +29,8 @@ export const userRouter = createTRPCRouter({
 
   setUserRole: protectedProcedure
     .input(z.object({ newRole: z.nativeEnum(UserRole) }))
-    .mutation(({ input, ctx }) => {
-      ctx.prisma.user.update({
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.user.update({
         where: { id: ctx.session.user.id },
         data: { role: input.newRole },
       });

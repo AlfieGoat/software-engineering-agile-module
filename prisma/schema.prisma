@@ -21,9 +21,9 @@ model Example {
 }
 
 model Product {
-    id            String @id
+    id            String @id @default(cuid())
     graphQLSchema String @db.Text
-
+    createdAt   DateTime @default(now())
     Customers Customer[]
 }
 
