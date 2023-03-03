@@ -16,7 +16,6 @@ export class PipelineStack extends Stack {
 
     const pipeline = new CodePipeline(this, "Pipeline", {
       pipelineName: "ProductBuilderPipeline",
-
       synth: new ShellStep("Synth", {
         input: CodePipelineSource.gitHub(
           "AlfieGoat/software-engineering-agile-module",
@@ -25,11 +24,8 @@ export class PipelineStack extends Stack {
         env: {
           SKIP_ENV_VALIDATION: "1",
         },
-
         commands: [
-          "npm install -g pnpm",
           "npm install",
-          "npm run build",
           "npm run synth",
         ],
       }),
