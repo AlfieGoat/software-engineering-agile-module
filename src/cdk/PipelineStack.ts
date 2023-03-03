@@ -22,6 +22,9 @@ export class PipelineStack extends Stack {
           "AlfieGoat/software-engineering-agile-module",
           "mainline"
         ),
+        env: {
+          SKIP_ENV_VALIDATION: "1",
+        },
 
         commands: [
           "npm install -g pnpm",
