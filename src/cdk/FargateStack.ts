@@ -104,7 +104,7 @@ export class FargateStack extends Stack {
     });
 
     taskDefinition.addContainer(`${id}-PostgresContainer`, {
-      image: ContainerImage.fromRegistry("docker.io/postgres/postgres:latest"),
+      image: ContainerImage.fromRegistry("public.ecr.aws/ubuntu/postgres:latest"),
       portMappings: [{ containerPort: 5432, hostPort: 5432 }],
       environment: {
         POSTGRES_PASSWORD: secretConfig
