@@ -18,10 +18,10 @@ export const userRouter = createTRPCRouter({
       };
     }),
 
-  getAll: publicProcedure.query(({ ctx }) => {
-    console.log(ctx.session?.user.role);
-    return ctx.prisma.example.findMany();
-  }),
+  // getAll: publicProcedure.query(({ ctx }) => {
+  //   console.log(ctx.session?.user.role);
+  //   return ctx.prisma.example.findMany();
+  // }),
 
   getSecretMessage: protectedProcedure.query(() => {
     return "you can now see this secret message!";

@@ -4,10 +4,10 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const productRouter = createTRPCRouter({
   productCreate: protectedProcedure
-    .input(z.object({ graphQLSchema: z.string() }))
+    .input(z.object({ graphQLSchema: z.string(), name: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const product = await ctx.prisma.product.create({
-        data: { graphQLSchema: input.graphQLSchema },
+        data: { name: input.name, graphQLSchema: input.graphQLSchema },
       });
 
       return product;
@@ -23,7 +23,7 @@ export const productRouter = createTRPCRouter({
       return product;
     }),
 
-  allProducts: protectedProcedure
+  productsAll: protectedProcedure
     .input(
       z.object({
         limit: z.number().min(1).max(100).nullish(),
@@ -43,7 +43,7 @@ export const productRouter = createTRPCRouter({
       let nextCursor: typeof cursor | undefined = undefined;
       if (items.length > limit) {
         const nextItem = items.pop();
-        nextCursor = nextItem!.id;
+        nextCursor = nextItem?.id;
       }
       return {
         items,
@@ -51,12 +51,13 @@ export const productRouter = createTRPCRouter({
       };
     }),
 
-  updateProductSchemaId: protectedProcedure
+  productEdit: protectedProcedure
     .input(
       z.object({
         productId: z.string(),
-        newProduct: z.object({
+        editedProduct: z.object({
           graphQLSchema: z.string(),
+          name: z.string(),
         }),
       })
     )
@@ -64,14 +65,15 @@ export const productRouter = createTRPCRouter({
       const product = await ctx.prisma.product.update({
         where: { id: input.productId },
         data: {
-          graphQLSchema: input.newProduct.graphQLSchema,
+          graphQLSchema: input.editedProduct.graphQLSchema,
+          name: input.editedProduct.name,
         },
       });
 
       return product;
     }),
 
-  deleteProductSchemaId: protectedProcedure
+  productDeleteById: protectedProcedure
     .input(
       z.object({
         productId: z.string(),
