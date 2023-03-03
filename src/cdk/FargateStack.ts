@@ -35,6 +35,7 @@ export class FargateStack extends Stack {
         ".next",
         ".git",
         "README.md",
+        "cdk.out",
       ],
       file: props.dockerFile,
     });
