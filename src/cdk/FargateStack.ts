@@ -27,6 +27,7 @@ export class FargateStack extends Stack {
     const dockerImage = new DockerImageAsset(this, `${id}-BackDockerImage`, {
       directory: props.dockerImageDirectory,
       exclude: [
+        "cdk.out",
         ".env",
         "Dockerfile",
         ".dockerignore",
@@ -35,7 +36,6 @@ export class FargateStack extends Stack {
         ".next",
         ".git",
         "README.md",
-        "cdk.out",
       ],
       file: props.dockerFile,
     });
@@ -77,18 +77,23 @@ export class FargateStack extends Stack {
       environment: {
         DATABASE_URL: secretConfig
           .secretValueFromJson("DATABASE_URL")
+          .unsafeUnwrap()
           .toString(),
         NEXTAUTH_URL: secretConfig
           .secretValueFromJson("NEXTAUTH_URL")
+          .unsafeUnwrap()
           .toString(),
         GITHUB_CLIENT_ID: secretConfig
           .secretValueFromJson("GITHUB_CLIENT_ID")
+          .unsafeUnwrap()
           .toString(),
         GITHUB_CLIENT_SECRET: secretConfig
           .secretValueFromJson("GITHUB_CLIENT_SECRET")
+          .unsafeUnwrap()
           .toString(),
         NEXTAUTH_SECRET: secretConfig
           .secretValueFromJson("NEXTAUTH_SECRET")
+          .unsafeUnwrap()
           .toString(),
       },
       logging: new AwsLogDriver({
@@ -104,6 +109,7 @@ export class FargateStack extends Stack {
       environment: {
         POSTGRES_PASSWORD: secretConfig
           .secretValueFromJson("POSTGRES_PASSWORD")
+          .unsafeUnwrap()
           .toString(),
       },
     });

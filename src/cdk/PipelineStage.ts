@@ -8,8 +8,8 @@ export class PipelineStage extends Stage {
     super(scope, id, props);
 
     new FargateStack(this, "ProductBuilder", {
-      dockerImageDirectory: join("../../"),
-      dockerFile: join("."),
+      dockerImageDirectory: join(__dirname, "../../"),
+      dockerFile: join("./Dockerfile"),
     });
   }
 }
