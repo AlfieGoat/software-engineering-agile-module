@@ -14,12 +14,21 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+model Subset {
+    id            String    @id @default(cuid())
+    createdAt     DateTime  @default(now())
+    products      Product[]
+    graphQLSchema String    @db.Text
+}
+
 model Product {
     id            String     @id @default(cuid())
     graphQLSchema String     @db.Text
     createdAt     DateTime   @default(now())
-    Customers     Customer[]
+    customers     Customer[]
     name          String
+    Subset        Subset?    @relation(fields: [subsetId], references: [id])
+    subsetId      String?
 }
 
 model Customer {
