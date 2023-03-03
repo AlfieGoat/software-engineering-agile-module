@@ -9,6 +9,7 @@
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
+  transpilePackages: ['@cloudscape-design/components'],
 
   /**
    * If you have the "experimental: { appDir: true }" setting enabled, then you
