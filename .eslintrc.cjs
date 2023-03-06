@@ -28,8 +28,11 @@ module.exports = {
     "@typescript-eslint/no-misused-promises": [
       "error",
       {
-        "checksVoidReturn": false
-      }
-    ]
+        checksVoidReturn: false,
+      },
+    ],
+  },
+  env: {
+    "jest/globals": true,
   },
 };

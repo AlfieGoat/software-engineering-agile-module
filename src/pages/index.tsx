@@ -32,14 +32,14 @@ interface NonePopupState {
 type Popup = CreatePopupState | EditPopupState | NonePopupState;
 
 const Home: NextPage = () => {
-  const products = api.product.productsAll.useInfiniteQuery(
+  const products = api.product.getAll.useInfiniteQuery(
     { limit: PAGE_SIZE },
     { getNextPageParam: (lastPage) => lastPage.nextCursor }
   );
 
   const [popupState, setPopupState] = useState<Popup>({ state: "None" });
 
-  const productsDeleteMutation = api.product.productDeleteById.useMutation();
+  const productsDeleteMutation = api.product.deleteById.useMutation();
 
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
 
@@ -104,7 +104,12 @@ const Home: NextPage = () => {
                   <Button>Create resource</Button>
                 </Box>
               }
-              filter={<TextFilter filteringPlaceholder="Find resources" filteringText=""/>}
+              filter={
+                <TextFilter
+                  filteringPlaceholder="Find resources"
+                  filteringText=""
+                />
+              }
               header={
                 <Header
                   counter={

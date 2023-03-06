@@ -19,7 +19,7 @@ const CreateNewProductPopup = ({
   refetchProductsData,
   closePopup,
 }: CreateNewProductsProps) => {
-  const productCreateMutation = api.product.productCreate.useMutation({});
+  const productCreateMutation = api.product.create.useMutation({});
 
   const [formData, setFormData] = useState({
     name: "",

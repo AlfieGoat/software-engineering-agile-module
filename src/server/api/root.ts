@@ -1,5 +1,6 @@
 import { userRouter } from "~/server/api/routers/user";
 import { createTRPCRouter } from "~/server/api/trpc";
+import { graphQLSubsetRouter } from "./routers/graphQLSubset";
 import { productRouter } from "./routers/product";
 
 /**
@@ -10,6 +11,7 @@ import { productRouter } from "./routers/product";
 export const appRouter = createTRPCRouter({
   user: userRouter,
   product: productRouter,
+  graphQLSubset: graphQLSubsetRouter
 });
 
 // export type definition of API

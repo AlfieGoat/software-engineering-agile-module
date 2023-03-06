@@ -22,7 +22,7 @@ const EditProductPopup = ({
   closePopup,
   product,
 }: EditProductPopupProps) => {
-  const productCreateMutation = api.product.productEdit.useMutation({});
+  const productCreateMutation = api.product.updateById.useMutation({});
 
   const [formData, setFormData] = useState({
     name: product.name,
@@ -38,7 +38,10 @@ const EditProductPopup = ({
             <div className="flex space-x-4">
               <Button
                 onClick={async () => {
-                  await productCreateMutation.mutateAsync({productId: product.id, editedProduct: {...formData}});
+                  await productCreateMutation.mutateAsync({
+                    productId: product.id,
+                    editedProduct: { ...formData },
+                  });
                   await refetchProductsData();
                   closePopup();
                 }}
