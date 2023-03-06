@@ -8,6 +8,7 @@ ENV SKIP_ENV_VALIDATION 1
 # Install Prisma Client - remove if not using Prisma
 
 COPY prisma ./
+COPY bin ./
 
 # Install dependencies based on the preferred package manager
 
@@ -57,8 +58,18 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
+COPY --from=deps --chown=nextjs:nodejs /app/schema.prisma ./prisma/schema.prisma
+COPY --from=deps --chown=nextjs:nodejs /app/entrypoint.sh ./entrypoint.sh
+
+RUN ls -a
+
+RUN chmod +x entrypoint.sh
+
 USER nextjs
 EXPOSE 3000
 ENV PORT 3000
+
+ENTRYPOINT ["./entrypoint.sh"]
 
 CMD ["node", "server.js"]
