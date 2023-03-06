@@ -1,228 +1,49 @@
-import { type NextPage } from "next";
-import Head from "next/head";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { CustomerHead } from "~/sections/CustomHead";
 
-import Box from "@cloudscape-design/components/box";
-import Button from "@cloudscape-design/components/button";
-import Cards from "@cloudscape-design/components/cards";
-import Header from "@cloudscape-design/components/header";
-import Pagination from "@cloudscape-design/components/pagination";
-import TextFilter from "@cloudscape-design/components/text-filter";
-
-import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
-import { type Product } from "@prisma/client";
-import CreateNewProductPopup from "~/sections/createNewProductPopup";
-import EditProductPopup from "~/sections/editProductPopup";
-import { api } from "~/utils/api";
-
-const PAGE_SIZE = 8;
-
-interface CreatePopupState {
-  state: "Create";
-}
-
-interface EditPopupState {
-  state: "Edit";
-}
-
-interface NonePopupState {
-  state: "None";
-}
-
-type Popup = CreatePopupState | EditPopupState | NonePopupState;
-
-const Home: NextPage = () => {
-  const products = api.product.getAll.useInfiniteQuery(
-    { limit: PAGE_SIZE },
-    { getNextPageParam: (lastPage) => lastPage.nextCursor }
-  );
-
-  const [popupState, setPopupState] = useState<Popup>({ state: "None" });
-
-  const productsDeleteMutation = api.product.deleteById.useMutation();
-
-  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-
-  const [showChild, setShowChild] = useState(false);
-
-  const [paginationIndex, setPaginationIndex] = useState(0);
-
-  // Wait until after client-side hydration to show
-  useEffect(() => {
-    setShowChild(true);
-  }, []);
-  if (!showChild) {
-    return null;
-  }
-
-  if (!products.data) return null;
-
+export default () => {
   return (
     <>
-      <Head>
-        <title>GraphQL Product Builder</title>
-        <meta name="description" content="GraphQL Product builder" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <main className="flex min-h-screen flex-col ">
-        <AppLayout
-          content={
-            <Cards
-              variant="full-page"
-              onSelectionChange={({ detail }) =>
-                setSelectedProducts(detail.selectedItems)
-              }
-              selectedItems={selectedProducts}
-              loading={products.isLoading}
-              cardDefinition={{
-                header: (e) => e.name,
-                sections: [
-                  {
-                    id: "createdAt",
-                    header: "Created At",
-                    content: (e: Product) => e.createdAt.toLocaleString(),
-                  },
-                  {
-                    id: "schema",
-                    header: "Schema",
-                    content: (e: Product) => e.graphQLSchema,
-                  },
-                ],
-              }}
-              cardsPerRow={[{ cards: 1 }, { minWidth: 500, cards: 2 }]}
-              items={products.data.pages[paginationIndex]?.items ?? []}
-              loadingText="Loading Products..."
-              selectionType="multi"
-              trackBy="id"
-              visibleSections={["createdAt", "schema"]}
-              empty={
-                <Box textAlign="center" color="inherit">
-                  <b>No resources</b>
-                  <Box padding={{ bottom: "s" }} variant="p" color="inherit">
-                    No resources to display.
-                  </Box>
-                  <Button>Create resource</Button>
-                </Box>
-              }
-              filter={
-                <TextFilter
-                  filteringPlaceholder="Find resources"
-                  filteringText=""
-                />
-              }
-              header={
-                <Header
-                  counter={
-                    selectedProducts.length
-                      ? `(${selectedProducts.length}/${
-                          products.data.pages.flatMap(
-                            (product) => product.items
-                          ).length
-                        })`
-                      : `(${
-                          products.data.pages.flatMap(
-                            (product) => product.items
-                          ).length
-                        })`
-                  }
-                  actions={
-                    <SpaceBetween size="xs" direction="horizontal">
-                      <Button
-                        data-testid="header-btn-view-details"
-                        disabled={selectedProducts.length !== 1}
-                      >
-                        View details
-                      </Button>
-                      <Button
-                        data-testid="header-btn-edit"
-                        disabled={selectedProducts.length !== 1}
-                        onClick={() => {
-                          setPopupState({
-                            state: "Edit",
-                          });
-                        }}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        data-testid="header-btn-delete"
-                        disabled={selectedProducts.length < 1}
-                        onClick={async () => {
-                          await Promise.all(
-                            selectedProducts.map((productToDelete) =>
-                              productsDeleteMutation.mutateAsync({
-                                productId: productToDelete.id,
-                              })
-                            )
-                          );
-                          setSelectedProducts([]);
-                          await products.refetch();
-                        }}
-                      >
-                        Delete
-                      </Button>
-                      <Button
-                        data-testid="header-btn-create"
-                        variant="primary"
-                        onClick={() => {
-                          setPopupState({ state: "Create" });
-                        }}
-                      >
-                        Create Product
-                      </Button>
-                    </SpaceBetween>
-                  }
+      <CustomerHead />
+      <div className="m-auto flex flex-col items-center">
+        <h1 className="mb-8 mt-48 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
+          The GraphQL Product Builder
+        </h1>
+        <p className="mb-8 text-center text-lg font-normal text-gray-500 dark:text-gray-400 sm:px-16 lg:text-xl xl:px-48">
+          The GraphQL Product Builder allows GraphQL schemas to be dynamically
+          applied to each GraphQL customer. A product is built up of GraphQL
+          subsets, once a product has been configured the product can be
+          assigned to as many customers as you want!
+        </p>
+        <div className="flex space-x-4">
+          {[
+            { href: "graphQLSubsets", text: "GraphQL Subsets" },
+            { href: "products", text: "Products" },
+            { href: "customers", text: "Customers" },
+          ].map((page) => {
+            return (
+              <Link
+                className="inline-flex items-center justify-center rounded-lg bg-blue-700 px-5 py-3 text-center text-base font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900"
+                href={page.href}
+              >
+                {page.text}
+                <svg
+                  className="ml-2 -mr-1 h-5 w-5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  GraphQL Product Builder
-                </Header>
-              }
-              pagination={
-                <Pagination
-                  currentPageIndex={paginationIndex + 1}
-                  pagesCount={
-                    products.hasNextPage
-                      ? products.data.pages.length + 1
-                      : products.data.pages.length
-                  }
-                  onNextPageClick={async () => {
-                    await products.fetchNextPage();
-                    setPaginationIndex(paginationIndex + 1);
-                  }}
-                  onPreviousPageClick={() => {
-                    setPaginationIndex(paginationIndex - 1);
-                  }}
-                />
-              }
-            />
-          }
-          contentType="cards"
-          toolsHide={true}
-          navigationHide={true}
-        />
-        {popupState.state === "Create" && (
-          <div className="absolute top-1/2 left-1/2 z-10 w-1/2 -translate-x-1/2 -translate-y-1/2 transform">
-            <CreateNewProductPopup
-              refetchProductsData={products.refetch as () => Promise<any>}
-              closePopup={() => {
-                setPopupState({ state: "None" });
-              }}
-            />
-          </div>
-        )}
-        {popupState.state === "Edit" && selectedProducts[0] && (
-          <div className="absolute top-1/2 left-1/2 z-10 w-1/2 -translate-x-1/2 -translate-y-1/2 transform">
-            <EditProductPopup
-              refetchProductsData={products.refetch as () => Promise<any>}
-              closePopup={() => {
-                setPopupState({ state: "None" });
-              }}
-              product={{ ...selectedProducts[0] }}
-            />
-          </div>
-        )}
-      </main>
+                  <path
+                    fill-rule="evenodd"
+                    d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
     </>
   );
 };
-
-export default Home;

@@ -11,7 +11,7 @@ import { productRouter } from "./routers/product";
 export const appRouter = createTRPCRouter({
   user: userRouter,
   product: productRouter,
-  graphQLSubset: graphQLSubsetRouter
+  graphQLSubset: graphQLSubsetRouter,
 });
 
 // export type definition of API

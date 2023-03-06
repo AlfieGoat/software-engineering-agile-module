@@ -83,7 +83,7 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
-    role          UserRole  @default(user)
+    role          UserRole  @default(admin)
 }
 
 model VerificationToken {
