@@ -10,10 +10,12 @@ import TextFilter from "@cloudscape-design/components/text-filter";
 
 import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
 import { type GraphQLSubset } from "@prisma/client";
+import Link from "next/link";
 import CreateNewGraphQLSubsetPopup from "~/sections/createNewGraphQLSubset";
 import { CustomerHead as CustomHead } from "~/sections/CustomHead";
 import EditGraphQLSubsetPopup from "~/sections/editGraphQLSubset";
 import { api } from "~/utils/api";
+import HomeButton from "~/sections/HomeButton";
 
 const PAGE_SIZE = 8;
 
@@ -172,7 +174,8 @@ const Home: NextPage = () => {
                     </SpaceBetween>
                   }
                 >
-                  GraphQL Subset
+                  <HomeButton/>
+                  GraphQL Subsets
                 </Header>
               }
               pagination={

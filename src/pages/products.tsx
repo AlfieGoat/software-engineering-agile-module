@@ -14,6 +14,7 @@ import CreateNewProductPopup from "~/sections/createNewProductPopup";
 import { CustomerHead } from "~/sections/CustomHead";
 import EditProductPopup from "~/sections/editProductPopup";
 import { api } from "~/utils/api";
+import HomeButton from "~/sections/HomeButton";
 
 const PAGE_SIZE = 8;
 
@@ -169,7 +170,8 @@ const Home: NextPage = () => {
                     </SpaceBetween>
                   }
                 >
-                  GraphQL Products 
+                  <HomeButton />
+                  GraphQL Products
                 </Header>
               }
               pagination={
