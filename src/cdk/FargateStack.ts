@@ -132,7 +132,8 @@ export class FargateStack extends Stack {
         
         certificate: props.certificate,
         domainName: props.domainName,
-        domainZone: props.hostedZone
+        domainZone: props.hostedZone,
+        redirectHTTP: true
       }
     );
 
