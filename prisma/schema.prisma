@@ -14,21 +14,22 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Subset {
-    id            String    @id @default(cuid())
-    createdAt     DateTime  @default(now())
-    products      Product[]
-    graphQLSchema String    @db.Text
+model GraphQLSubset {
+    id                String              @id @default(cuid())
+    createdAt         DateTime            @default(now())
+    graphQLSchema     String              @db.Text
+    name              String
+    description       String?             @db.Text
+    products          Product[]
 }
 
 model Product {
-    id            String     @id @default(cuid())
-    graphQLSchema String     @db.Text
-    createdAt     DateTime   @default(now())
-    customers     Customer[]
+    id            String              @id @default(cuid())
+    createdAt     DateTime            @default(now())
+    graphQLSchema String              @db.Text
     name          String
-    Subset        Subset?    @relation(fields: [subsetId], references: [id])
-    subsetId      String?
+    customers     Customer[]
+    subsets       GraphQLSubset[]
 }
 
 model Customer {
@@ -37,7 +38,7 @@ model Customer {
     updatedAt   DateTime @updatedAt
     name        String
     description String   @db.Text
-    product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+    product     Product  @relation(fields: [productId], references: [id])
     productId   String
 }
 
