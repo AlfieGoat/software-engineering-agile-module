@@ -1,4 +1,5 @@
 import { Stack, type StackProps } from "aws-cdk-lib";
+import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
 import { SubnetType, Vpc } from "aws-cdk-lib/aws-ec2";
 import { DockerImageAsset } from "aws-cdk-lib/aws-ecr-assets";
 import {
@@ -12,12 +13,17 @@ import {
 import { ApplicationLoadBalancedFargateService } from "aws-cdk-lib/aws-ecs-patterns";
 import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
+import { IHostedZone } from "aws-cdk-lib/aws-route53";
 import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 import { type Construct } from "constructs";
 
 interface FargateStackProps extends StackProps {
   dockerImageDirectory: string;
   dockerFile: string;
+
+  certificate: ICertificate;
+  domainName: string;
+  hostedZone: IHostedZone;
 }
 
 export class FargateStack extends Stack {
@@ -123,6 +129,10 @@ export class FargateStack extends Stack {
         taskDefinition,
         publicLoadBalancer: true,
         assignPublicIp: true,
+        
+        certificate: props.certificate,
+        domainName: props.domainName,
+        domainZone: props.hostedZone
       }
     );
 
