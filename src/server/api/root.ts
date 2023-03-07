@@ -1,7 +1,7 @@
-import { userRouter } from "~/server/api/routers/user";
+import { userRouter } from "~/server/api/routers/user/router";
 import { createTRPCRouter } from "~/server/api/trpc";
-import { graphQLSubsetRouter } from "./routers/graphQLSubset";
-import { productRouter } from "./routers/product";
+import { graphQLSubsetRouter } from "./routers/graphQLSubset/router";
+import { productRouter } from "./routers/product/router";
 
 /**
  * This is the primary router for your server.

@@ -1,11 +1,12 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedAdminProcedure } from "~/server/api/trpc";
+import { validateAndParseGraphQLSchema } from "./graphQL";
 
 const DEFAULT_PAGE_SIZE = 50;
 const MAX_PAGE_SIZE = 100;
 
-const NAME_SCHEMA = z.string().min(5).max(80);
+const NAME_SCHEMA = z.string().min(4).max(80);
 const DESCRIPTION_SCHEMA = z.string().min(1).max(1000).optional();
 
 export const graphQLSubsetRouter = createTRPCRouter({
@@ -19,6 +20,8 @@ export const graphQLSubsetRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { graphQLSchema, name, description } = input;
+
+      validateAndParseGraphQLSchema(graphQLSchema);
 
       const subset = await ctx.prisma.graphQLSubset.create({
         data: { graphQLSchema, name, description },
@@ -80,6 +83,8 @@ export const graphQLSubsetRouter = createTRPCRouter({
       await ctx.prisma.graphQLSubset.findUniqueOrThrow({
         where: { id: input.graphQLSubsetId },
       });
+
+      validateAndParseGraphQLSchema(input.editedGraphQLSubset.graphQLSchema);
 
       const graphQLSubset = await ctx.prisma.graphQLSubset.update({
         where: { id: input.graphQLSubsetId },
