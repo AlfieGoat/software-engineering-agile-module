@@ -12,7 +12,7 @@ import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
 import { GraphQLSubset, Product } from "@prisma/client";
 import CustomHead from "~/sections/CustomHead";
 import HomeButton from "~/sections/HomeButton";
-import ProductPopup from "~/sections/ProductPopup";
+import ProductPopup from "~/sections/ProductPopup/index";
 import { api } from "~/utils/api";
 
 const PAGE_SIZE = 8;
