@@ -9,11 +9,11 @@ import Pagination from "@cloudscape-design/components/pagination";
 import TextFilter from "@cloudscape-design/components/text-filter";
 
 import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
-import { type Product } from "@prisma/client";
-import EditProductPopup from "~/sections/EditProductPopup";
+import { GraphQLSubset, Product } from "@prisma/client";
 import CreateNewProductPopup from "~/sections/CreateNewProductPopup";
-import HomeButton from "~/sections/HomeButton";
 import CustomHead from "~/sections/CustomHead";
+import EditProductPopup from "~/sections/EditProductPopup";
+import HomeButton from "~/sections/HomeButton";
 import { api } from "~/utils/api";
 
 const PAGE_SIZE = 8;
@@ -42,7 +42,13 @@ const Home: NextPage = () => {
 
   const productsDeleteMutation = api.product.deleteById.useMutation();
 
-  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<
+    Array<
+      Product & {
+        subsets: GraphQLSubset[];
+      }
+    >
+  >([]);
 
   const [showChild, setShowChild] = useState(false);
 
@@ -77,12 +83,15 @@ const Home: NextPage = () => {
                   {
                     id: "createdAt",
                     header: "Created At",
-                    content: (e: Product) => e.createdAt.toLocaleString(),
+                    content: (e) => e.createdAt.toLocaleString(),
                   },
                   {
-                    id: "schema",
-                    header: "Schema",
-                    content: (e: Product) => e.graphQLSchema,
+                    id: "graphQLSubsets",
+                    header: "GraphQL Subsets",
+                    content: (e) =>
+                      e.subsets.map((subset) => (
+                        <li className="list-inside list-disc">{subset.name}</li>
+                      )),
                   },
                 ],
               }}
@@ -91,7 +100,7 @@ const Home: NextPage = () => {
               loadingText="Loading Products..."
               selectionType="multi"
               trackBy="id"
-              visibleSections={["createdAt", "schema"]}
+              visibleSections={["createdAt", "graphQLSubsets"]}
               empty={
                 <Box textAlign="center" color="inherit">
                   <b>No resources</b>

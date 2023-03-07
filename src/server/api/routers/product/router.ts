@@ -5,11 +5,13 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 const DEFAULT_PAGE_SIZE = 50;
 const MAX_PAGE_SIZE = 100;
 
+const NAME_SCHEMA = z.string().min(4).max(80);
+
 export const productRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
-        name: z.string(),
+        name: NAME_SCHEMA,
         graphQLSubsets: z.array(z.object({ id: z.string() })).min(1),
       })
     )
@@ -51,6 +53,7 @@ export const productRouter = createTRPCRouter({
         orderBy: {
           createdAt: "asc",
         },
+        include: { subsets: true },
       });
       let nextCursor: typeof cursor | undefined = undefined;
       if (items.length > limit) {
@@ -69,7 +72,7 @@ export const productRouter = createTRPCRouter({
         productId: z.string(),
         editedProduct: z.object({
           graphQLSchema: z.string(),
-          name: z.string(),
+          name: NAME_SCHEMA,
         }),
       })
     )

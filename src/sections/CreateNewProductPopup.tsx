@@ -121,7 +121,7 @@ const SubsetSelection = () => {
     setGraphQLSubsetComponentLoading(isLoading);
   }, [isLoading]);
 
-  if (!data || isLoading) return <>Loading...</>;
+  if (!data) return <></>;
 
   return (
     <>
@@ -142,7 +142,7 @@ const SubsetSelection = () => {
           setCurrentPageIndex(currentPageIndex - 1);
         }}
       />
-      {data?.pages[currentPageIndex]?.items.map((graphQLSubset) => (
+      {data.pages[currentPageIndex]?.items.map((graphQLSubset) => (
         <Checkbox
           key={graphQLSubset.id}
           checked={formData.graphQLSubsetIds.includes(graphQLSubset.id)}
