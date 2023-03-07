@@ -7,6 +7,7 @@ import {
   Input,
   Pagination,
 } from "@cloudscape-design/components";
+import { GraphQLSubset, Product } from "@prisma/client";
 import produce from "immer";
 import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
@@ -15,8 +16,20 @@ import { api } from "~/utils/api";
 const PAGE_SIZE = 8;
 
 interface CreateNewProductsProps {
+  type: "Create";
   refetchProductsData: (...args: any[]) => Promise<void>;
   closePopup: () => void;
+  removeSelected: () => void;
+}
+
+interface EditProductsProps {
+  type: "Edit";
+  productToEdit: Product & {
+    subsets: GraphQLSubset[];
+  };
+  refetchProductsData: (...args: any[]) => Promise<void>;
+  closePopup: () => void;
+  removeSelected: () => void;
 }
 
 const graphQLSubsetComponentLoadingAtom = atom(true);
@@ -31,13 +44,64 @@ const formDataAtom = atom<Form>({
   graphQLSubsetIds: [],
 });
 
-const CreateNewProductPopup = ({
-  refetchProductsData,
-  closePopup,
-}: CreateNewProductsProps) => {
+const Content = {
+  Create: {
+    headingText: "Create Product",
+    buttonText: "Create",
+  },
+  Edit: {
+    headingText: "Edit Product",
+    buttonText: "Edit",
+  },
+};
+
+const ProductPopup = (props: CreateNewProductsProps | EditProductsProps) => {
   const productCreateMutation = api.product.create.useMutation({});
+  const productUpdateMutation = api.product.updateById.useMutation({});
+
+  const contentForType = Content[props.type];
+
+  const onSubmit = async (
+    formData: Form,
+    props: CreateNewProductsProps | EditProductsProps,
+  ) => {
+    if (props.type === "Create") {
+      await productCreateMutation.mutateAsync({
+        name: formData.name,
+        graphQLSubsets: formData.graphQLSubsetIds.map((graphQLSubsetId) => ({
+          id: graphQLSubsetId,
+        })),
+      });
+    } else {
+      await productUpdateMutation.mutateAsync({
+        productId: props.productToEdit.id,
+        editedProduct: {
+          name: formData.name,
+          graphQLSubsets: formData.graphQLSubsetIds.map((graphQLSubsetId) => ({
+            id: graphQLSubsetId,
+          })),
+        },
+      });
+    }
+    await props.refetchProductsData();
+    props.closePopup();
+    props.removeSelected();
+  };
 
   const [formData, setFormData] = useAtom(formDataAtom);
+
+  useEffect(() => {
+    if (props.type === "Edit") {
+      setFormData(
+        produce((draft) => {
+          draft.graphQLSubsetIds = props.productToEdit.subsets.map(
+            (graphQLSubset) => graphQLSubset.id
+          );
+          draft.name = props.productToEdit.name;
+        }, formData)
+      );
+    }
+  }, []);
 
   const [graphQLSubsetComponentLoading] = useAtom(
     graphQLSubsetComponentLoadingAtom
@@ -50,27 +114,16 @@ const CreateNewProductPopup = ({
           variant="h2"
           actions={
             <div className="flex space-x-4">
-              <Button
-                onClick={async () => {
-                  await productCreateMutation.mutateAsync({
-                    name: formData.name,
-                    graphQLSubsets: formData.graphQLSubsetIds.map(
-                      (graphQLSubsetId) => ({ id: graphQLSubsetId })
-                    ),
-                  });
-                  await refetchProductsData();
-                  closePopup();
-                }}
-              >
-                Create Product
+              <Button onClick={() => onSubmit(formData, props)}>
+                {contentForType.headingText}
               </Button>
-              <button className="self-center pr-2" onClick={closePopup}>
+              <button className="self-center pr-2" onClick={props.closePopup}>
                 <Icon variant="link" name="close" />
               </button>
             </div>
           }
         >
-          Create Product
+          {contentForType.buttonText}
         </Header>
       }
     >
@@ -100,7 +153,7 @@ const CreateNewProductPopup = ({
   );
 };
 
-export default CreateNewProductPopup;
+export default ProductPopup;
 
 const SubsetSelection = () => {
   const [, setGraphQLSubsetComponentLoading] = useAtom(

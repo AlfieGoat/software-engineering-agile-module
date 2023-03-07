@@ -84,17 +84,29 @@ export const productRouter = createTRPCRouter({
       z.object({
         productId: z.string(),
         editedProduct: z.object({
-          graphQLSchema: z.string(),
+          graphQLSubsets: z.array(z.object({ id: z.string() })).min(1),
           name: NAME_SCHEMA,
         }),
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const graphQLSubsets = await ctx.prisma.graphQLSubset.findMany({
+        where: {
+          id: {
+            in: input.editedProduct.graphQLSubsets.map((graphQLSubset) => graphQLSubset.id),
+          },
+        },
+      });
+
+      const mergedSchemas = mergeSchemas(graphQLSubsets);
+      const mergedSchemasSdl = printWithComments(mergedSchemas);
+
       const product = await ctx.prisma.product.update({
         where: { id: input.productId },
         data: {
-          graphQLSchema: input.editedProduct.graphQLSchema,
+          graphQLSchema: mergedSchemasSdl,
           name: input.editedProduct.name,
+          subsets: {set: input.editedProduct.graphQLSubsets}
         },
       });
 

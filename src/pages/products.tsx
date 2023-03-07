@@ -10,10 +10,9 @@ import TextFilter from "@cloudscape-design/components/text-filter";
 
 import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
 import { GraphQLSubset, Product } from "@prisma/client";
-import CreateNewProductPopup from "~/sections/CreateNewProductPopup";
 import CustomHead from "~/sections/CustomHead";
-import EditProductPopup from "~/sections/EditProductPopup";
 import HomeButton from "~/sections/HomeButton";
+import ProductPopup from "~/sections/ProductPopup";
 import { api } from "~/utils/api";
 
 const PAGE_SIZE = 8;
@@ -93,6 +92,15 @@ const Home: NextPage = () => {
                         <li className="list-inside list-disc">{subset.name}</li>
                       )),
                   },
+                  {
+                    id: "graphQLSchema",
+                    header: "GraphQL Schema",
+                    content: (e) => (
+                      <div className="whitespace-pre-wrap">
+                        {e.graphQLSchema}
+                      </div>
+                    ),
+                  },
                 ],
               }}
               cardsPerRow={[{ cards: 1 }, { minWidth: 500, cards: 2 }]}
@@ -100,7 +108,7 @@ const Home: NextPage = () => {
               loadingText="Loading Products..."
               selectionType="multi"
               trackBy="id"
-              visibleSections={["createdAt", "graphQLSubsets"]}
+              visibleSections={["createdAt", "graphQLSubsets", "graphQLSchema"]}
               empty={
                 <Box textAlign="center" color="inherit">
                   <b>No resources</b>
@@ -208,22 +216,30 @@ const Home: NextPage = () => {
         />
         {popupState.state === "Create" && (
           <div className="absolute top-1/2 left-1/2 z-10 w-1/2 -translate-x-1/2 -translate-y-1/2 transform">
-            <CreateNewProductPopup
+            <ProductPopup
+              type="Create"
               refetchProductsData={products.refetch as () => Promise<any>}
               closePopup={() => {
                 setPopupState({ state: "None" });
+              }}
+              removeSelected={() => {
+                setSelectedProducts([]);
               }}
             />
           </div>
         )}
         {popupState.state === "Edit" && selectedProducts[0] && (
           <div className="absolute top-1/2 left-1/2 z-10 w-1/2 -translate-x-1/2 -translate-y-1/2 transform">
-            <EditProductPopup
+            <ProductPopup
+              type="Edit"
               refetchProductsData={products.refetch as () => Promise<any>}
               closePopup={() => {
                 setPopupState({ state: "None" });
               }}
-              product={{ ...selectedProducts[0] }}
+              productToEdit={{ ...selectedProducts[0] }}
+              removeSelected={() => {
+                setSelectedProducts([]);
+              }}
             />
           </div>
         )}
