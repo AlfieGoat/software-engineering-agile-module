@@ -12,7 +12,7 @@ import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
 
-const PAGE_SIZE = 4;
+const PAGE_SIZE = 8;
 
 interface CreateNewProductsProps {
   refetchProductsData: (...args: any[]) => Promise<void>;

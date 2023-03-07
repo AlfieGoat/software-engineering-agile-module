@@ -1,6 +1,8 @@
+import { printWithComments } from "@graphql-toolkit/schema-merging";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { mergeSchemas } from "./schemaMerge";
 
 const DEFAULT_PAGE_SIZE = 50;
 const MAX_PAGE_SIZE = 100;
@@ -16,10 +18,21 @@ export const productRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const graphQLSubsets = await ctx.prisma.graphQLSubset.findMany({
+        where: {
+          id: {
+            in: input.graphQLSubsets.map((graphQLSubset) => graphQLSubset.id),
+          },
+        },
+      });
+
+      const mergedSchemas = mergeSchemas(graphQLSubsets);
+      const mergedSchemasSdl = printWithComments(mergedSchemas);
+
       const product = await ctx.prisma.product.create({
         data: {
           name: input.name,
-          graphQLSchema: "",
+          graphQLSchema: mergedSchemasSdl,
           subsets: { connect: input.graphQLSubsets },
         },
       });
