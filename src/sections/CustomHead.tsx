@@ -1,6 +1,6 @@
 import Head from "next/head";
 
-export function CustomerHead() {
+export default function CustomHead() {
     return (
       <Head>
         <title>GraphQL Product Builder</title>

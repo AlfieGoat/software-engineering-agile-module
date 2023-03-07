@@ -10,10 +10,9 @@ import TextFilter from "@cloudscape-design/components/text-filter";
 
 import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
 import { type GraphQLSubset } from "@prisma/client";
-import Link from "next/link";
-import CreateNewGraphQLSubsetPopup from "~/sections/createNewGraphQLSubset";
-import { CustomerHead as CustomHead } from "~/sections/CustomHead";
-import EditGraphQLSubsetPopup from "~/sections/editGraphQLSubset";
+import CreateNewGraphQLSubsetPopup from "~/sections/CreateNewGraphQLSubset";
+import CustomHead from "~/sections/CustomHead";
+import EditGraphQLSubsetPopup from "~/sections/EditGraphQLSubset";
 import { api } from "~/utils/api";
 import HomeButton from "~/sections/HomeButton";
 

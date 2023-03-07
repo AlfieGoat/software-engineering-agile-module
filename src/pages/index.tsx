@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { CustomerHead } from "~/sections/CustomHead";
+import CustomHead from "~/sections/CustomHead";
 
 export default () => {
   return (
     <>
-      <CustomerHead />
+      <CustomHead />
       <div className="min-h-screen mx-auto flex w-full flex-col px-1 text-gray-700 antialiased">
         <div className="mw-auto flex flex-col flex-1 items-center">
           <h1 className="mb-8 mt-48 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">

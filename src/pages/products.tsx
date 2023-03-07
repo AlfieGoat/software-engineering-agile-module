@@ -10,11 +10,11 @@ import TextFilter from "@cloudscape-design/components/text-filter";
 
 import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
 import { type Product } from "@prisma/client";
-import CreateNewProductPopup from "~/sections/createNewProductPopup";
-import { CustomerHead } from "~/sections/CustomHead";
-import EditProductPopup from "~/sections/editProductPopup";
-import { api } from "~/utils/api";
+import EditProductPopup from "~/sections/EditProductPopup";
+import CreateNewProductPopup from "~/sections/CreateNewProductPopup";
 import HomeButton from "~/sections/HomeButton";
+import CustomHead from "~/sections/CustomHead";
+import { api } from "~/utils/api";
 
 const PAGE_SIZE = 8;
 
@@ -60,7 +60,7 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <CustomerHead />
+      <CustomHead />
       <main className="flex min-h-screen flex-col ">
         <AppLayout
           content={
