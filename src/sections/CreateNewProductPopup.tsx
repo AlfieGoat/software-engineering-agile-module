@@ -1,19 +1,35 @@
 import {
   Button,
+  Checkbox,
   Container,
   Header,
   Icon,
   Input,
-  Textarea,
+  Pagination,
 } from "@cloudscape-design/components";
 import produce from "immer";
-import { useState } from "react";
+import { atom, useAtom } from "jotai";
+import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
+
+const PAGE_SIZE = 4;
 
 interface CreateNewProductsProps {
   refetchProductsData: (...args: any[]) => Promise<void>;
   closePopup: () => void;
 }
+
+const graphQLSubsetComponentLoadingAtom = atom(true);
+
+interface Form {
+  name: string;
+  graphQLSubsetIds: string[];
+}
+
+const formDataAtom = atom<Form>({
+  name: "",
+  graphQLSubsetIds: [],
+});
 
 const CreateNewProductPopup = ({
   refetchProductsData,
@@ -21,10 +37,11 @@ const CreateNewProductPopup = ({
 }: CreateNewProductsProps) => {
   const productCreateMutation = api.product.create.useMutation({});
 
-  const [formData, setFormData] = useState({
-    name: "",
-    graphQLSchema: "",
-  });
+  const [formData, setFormData] = useAtom(formDataAtom);
+
+  const [graphQLSubsetComponentLoading] = useAtom(
+    graphQLSubsetComponentLoadingAtom
+  );
 
   return (
     <Container
@@ -35,7 +52,12 @@ const CreateNewProductPopup = ({
             <div className="flex space-x-4">
               <Button
                 onClick={async () => {
-                  await productCreateMutation.mutateAsync(formData);
+                  await productCreateMutation.mutateAsync({
+                    name: formData.name,
+                    graphQLSubsets: formData.graphQLSubsetIds.map(
+                      (graphQLSubsetId) => ({ id: graphQLSubsetId })
+                    ),
+                  });
                   await refetchProductsData();
                   closePopup();
                 }}
@@ -52,7 +74,12 @@ const CreateNewProductPopup = ({
         </Header>
       }
     >
-      <div className="flex flex-col p-2">
+      {graphQLSubsetComponentLoading && <>Loading...</>}
+      <div
+        className={`flex flex-col p-2 ${
+          graphQLSubsetComponentLoading ? "none" : ""
+        }`}
+      >
         <Input
           type="text"
           name="name"
@@ -67,21 +94,77 @@ const CreateNewProductPopup = ({
           className="mb-3"
           placeholder="Product Name"
         />
-        <Textarea
-          onChange={(event) => {
-            setFormData(
-              produce(formData, (draft) => {
-                draft.graphQLSchema = event.detail.value;
-              })
-            );
-          }}
-          name="graphQLSchema"
-          value={formData.graphQLSchema}
-          placeholder="GraphQL Schema"
-        />
+        <SubsetSelection />
       </div>
     </Container>
   );
 };
 
 export default CreateNewProductPopup;
+
+const SubsetSelection = () => {
+  const [, setGraphQLSubsetComponentLoading] = useAtom(
+    graphQLSubsetComponentLoadingAtom
+  );
+
+  const [formData, setFormData] = useAtom(formDataAtom);
+
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+
+  const { data, isLoading, hasNextPage, fetchNextPage } =
+    api.graphQLSubset.getAll.useInfiniteQuery(
+      { limit: PAGE_SIZE },
+      { getNextPageParam: (lastPage) => lastPage.nextCursor }
+    );
+
+  useEffect(() => {
+    setGraphQLSubsetComponentLoading(isLoading);
+  }, [isLoading]);
+
+  if (!data || isLoading) return <>Loading...</>;
+
+  return (
+    <>
+      <Pagination
+        ariaLabels={{
+          nextPageLabel: "Next page",
+          previousPageLabel: "Previous page",
+          pageLabel: (pageNumber) => `Page ${pageNumber} of all pages`,
+        }}
+        currentPageIndex={currentPageIndex + 1}
+        onChange={({ detail }) => setCurrentPageIndex(detail.currentPageIndex)}
+        pagesCount={hasNextPage ? data?.pages.length + 1 : data?.pages.length}
+        onNextPageClick={async () => {
+          await fetchNextPage();
+          setCurrentPageIndex(currentPageIndex + 1);
+        }}
+        onPreviousPageClick={() => {
+          setCurrentPageIndex(currentPageIndex - 1);
+        }}
+      />
+      {data?.pages[currentPageIndex]?.items.map((graphQLSubset) => (
+        <Checkbox
+          key={graphQLSubset.id}
+          checked={formData.graphQLSubsetIds.includes(graphQLSubset.id)}
+          onChange={({ detail }) => {
+            setFormData(
+              produce((draft) => {
+                if (detail.checked) {
+                  if (draft.graphQLSubsetIds.includes(graphQLSubset.id)) return;
+                  draft.graphQLSubsetIds.push(graphQLSubset.id);
+                } else {
+                  draft.graphQLSubsetIds = draft.graphQLSubsetIds.filter(
+                    (otherGraphQLSubsets) =>
+                      otherGraphQLSubsets !== graphQLSubset.id
+                  );
+                }
+              }, formData)
+            );
+          }}
+        >
+          {graphQLSubset.name}
+        </Checkbox>
+      ))}
+    </>
+  );
+};

@@ -7,10 +7,19 @@ const MAX_PAGE_SIZE = 100;
 
 export const productRouter = createTRPCRouter({
   create: protectedProcedure
-    .input(z.object({ graphQLSchema: z.string(), name: z.string() }))
+    .input(
+      z.object({
+        name: z.string(),
+        graphQLSubsets: z.array(z.object({ id: z.string() })).min(1),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       const product = await ctx.prisma.product.create({
-        data: { name: input.name, graphQLSchema: input.graphQLSchema },
+        data: {
+          name: input.name,
+          graphQLSchema: "",
+          subsets: { connect: input.graphQLSubsets },
+        },
       });
 
       return product;
