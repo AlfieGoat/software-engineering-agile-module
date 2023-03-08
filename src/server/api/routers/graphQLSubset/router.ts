@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedAdminProcedure } from "~/server/api/trpc";
@@ -118,9 +119,8 @@ export const graphQLSubsetRouter = createTRPCRouter({
             )
           )
         );
-        
-        return graphQLSubset
 
+        return graphQLSubset;
       });
     }),
 
@@ -131,9 +131,17 @@ export const graphQLSubsetRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.graphQLSubset.findUniqueOrThrow({
+      const graphQLSubset = await ctx.prisma.graphQLSubset.findUniqueOrThrow({
         where: { id: input.graphQLSubsetId },
+        include: { products: true },
       });
+
+      if (graphQLSubset.products.length > 0)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "You cannot delete a GraphQLSubset that is still associated with products.",
+        });
 
       await ctx.prisma.graphQLSubset.delete({
         where: { id: input.graphQLSubsetId },
