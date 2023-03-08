@@ -22,7 +22,7 @@ const EditGraphQLSubsetPopup = ({
   closePopup,
   graphQLSubset,
 }: EditGraphQLSubsetPopupProps) => {
-  const graphQLSubsetCreateMutation = api.graphQLSubset.updateById.useMutation(
+  const graphQLSubsetEditMutation = api.graphQLSubset.updateById.useMutation(
     {}
   );
 
@@ -40,7 +40,7 @@ const EditGraphQLSubsetPopup = ({
             <div className="flex space-x-4">
               <Button
                 onClick={async () => {
-                  await graphQLSubsetCreateMutation.mutateAsync({
+                  await graphQLSubsetEditMutation.mutateAsync({
                     graphQLSubsetId: graphQLSubset.id,
                     editedGraphQLSubset: { ...formData },
                   });

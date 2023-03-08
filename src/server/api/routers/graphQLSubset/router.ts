@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedAdminProcedure } from "~/server/api/trpc";
+import { updateProduct } from "../product/schemaMerge";
 import { validateAndParseGraphQLSchema } from "./graphQL";
 
 const DEFAULT_PAGE_SIZE = 50;
@@ -80,22 +81,47 @@ export const graphQLSubsetRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.graphQLSubset.findUniqueOrThrow({
-        where: { id: input.graphQLSubsetId },
-      });
+      const oldGraphQLSubset = await ctx.prisma.graphQLSubset.findUniqueOrThrow(
+        {
+          where: { id: input.graphQLSubsetId },
+          include: { products: { include: { subsets: true } } },
+        }
+      );
 
       validateAndParseGraphQLSchema(input.editedGraphQLSubset.graphQLSchema);
 
-      const graphQLSubset = await ctx.prisma.graphQLSubset.update({
-        where: { id: input.graphQLSubsetId },
-        data: {
-          graphQLSchema: input.editedGraphQLSubset.graphQLSchema,
-          name: input.editedGraphQLSubset.name,
-          description: input.editedGraphQLSubset.graphQLSchema,
-        },
-      });
+      const products = oldGraphQLSubset.products;
 
-      return graphQLSubset;
+      return await ctx.prisma.$transaction(async (tx) => {
+        const graphQLSubset = await ctx.prisma.graphQLSubset.update({
+          where: { id: input.graphQLSubsetId },
+          data: {
+            graphQLSchema: input.editedGraphQLSubset.graphQLSchema,
+            name: input.editedGraphQLSubset.name,
+            description: input.editedGraphQLSubset.graphQLSchema,
+          },
+        });
+
+        await Promise.all(
+          products.map((product) =>
+            updateProduct(
+              {
+                editedProduct: {
+                  graphQLSubsets: product.subsets.map((subset) => ({
+                    id: subset.id,
+                  })),
+                  name: product.name,
+                },
+                productId: product.id,
+              },
+              tx
+            )
+          )
+        );
+        
+        return graphQLSubset
+
+      });
     }),
 
   deleteById: protectedAdminProcedure

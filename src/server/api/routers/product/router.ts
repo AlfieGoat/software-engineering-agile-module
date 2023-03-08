@@ -2,12 +2,23 @@ import { printWithComments } from "@graphql-toolkit/schema-merging";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { mergeSchemas } from "./schemaMerge";
+import {
+  mergeSchemas,
+  updateProduct,
+} from "./schemaMerge";
 
 const DEFAULT_PAGE_SIZE = 50;
 const MAX_PAGE_SIZE = 100;
 
-const NAME_SCHEMA = z.string().min(4).max(80);
+export const NAME_SCHEMA = z.string().min(4).max(80);
+
+export const UpdateProductInputSchema = z.object({
+  productId: z.string(),
+  editedProduct: z.object({
+    graphQLSubsets: z.array(z.object({ id: z.string() })).min(1),
+    name: NAME_SCHEMA,
+  }),
+});
 
 export const productRouter = createTRPCRouter({
   create: protectedProcedure
@@ -80,37 +91,9 @@ export const productRouter = createTRPCRouter({
     }),
 
   updateById: protectedProcedure
-    .input(
-      z.object({
-        productId: z.string(),
-        editedProduct: z.object({
-          graphQLSubsets: z.array(z.object({ id: z.string() })).min(1),
-          name: NAME_SCHEMA,
-        }),
-      })
-    )
+    .input(UpdateProductInputSchema)
     .mutation(async ({ ctx, input }) => {
-      const graphQLSubsets = await ctx.prisma.graphQLSubset.findMany({
-        where: {
-          id: {
-            in: input.editedProduct.graphQLSubsets.map((graphQLSubset) => graphQLSubset.id),
-          },
-        },
-      });
-
-      const mergedSchemas = mergeSchemas(graphQLSubsets);
-      const mergedSchemasSdl = printWithComments(mergedSchemas);
-
-      const product = await ctx.prisma.product.update({
-        where: { id: input.productId },
-        data: {
-          graphQLSchema: mergedSchemasSdl,
-          name: input.editedProduct.name,
-          subsets: {set: input.editedProduct.graphQLSubsets}
-        },
-      });
-
-      return product;
+      return await updateProduct(input, ctx.prisma);
     }),
 
   deleteById: protectedProcedure
