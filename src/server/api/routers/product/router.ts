@@ -1,4 +1,5 @@
 import { printWithComments } from "@graphql-toolkit/schema-merging";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
@@ -100,6 +101,18 @@ export const productRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const product = await ctx.prisma.product.findUniqueOrThrow({
+        where: { id: input.productId },
+        include: { customers: true },
+      });
+
+      if (product.customers.length > 0)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "You cannot delete a Product that is still associated with Customers.",
+        });
+      
       await ctx.prisma.product.delete({
         where: { id: input.productId },
       });
