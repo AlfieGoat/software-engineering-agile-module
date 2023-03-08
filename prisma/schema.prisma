@@ -15,29 +15,29 @@ datasource db {
 }
 
 model GraphQLSubset {
-    id                String              @id @default(cuid())
-    createdAt         DateTime            @default(now())
-    graphQLSchema     String              @db.Text
-    name              String
-    description       String?             @db.Text
-    products          Product[]
+    id            String    @id @default(cuid())
+    createdAt     DateTime  @default(now())
+    graphQLSchema String    @db.Text
+    name          String
+    description   String?   @db.Text
+    products      Product[]
 }
 
 model Product {
-    id            String              @id @default(cuid())
-    createdAt     DateTime            @default(now())
-    graphQLSchema String              @db.Text
+    id            String          @id @default(cuid())
+    createdAt     DateTime        @default(now())
+    graphQLSchema String          @db.Text
     name          String
     customers     Customer[]
     subsets       GraphQLSubset[]
 }
 
 model Customer {
-    id          String   @id
+    id          String   @id @default(cuid())
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
     name        String
-    description String   @db.Text
+    description String?   @db.Text
     product     Product  @relation(fields: [productId], references: [id])
     productId   String
 }

@@ -2,10 +2,7 @@ import { printWithComments } from "@graphql-toolkit/schema-merging";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import {
-  mergeSchemas,
-  updateProduct,
-} from "./schemaMerge";
+import { mergeSchemas, updateProduct } from "./graphQL";
 
 const DEFAULT_PAGE_SIZE = 50;
 const MAX_PAGE_SIZE = 100;

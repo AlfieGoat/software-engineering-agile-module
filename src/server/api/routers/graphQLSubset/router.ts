@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedAdminProcedure } from "~/server/api/trpc";
-import { updateProduct } from "../product/schemaMerge";
+import { updateProduct } from "../product/graphQL";
 import { validateAndParseGraphQLSchema } from "./graphQL";
 
 const DEFAULT_PAGE_SIZE = 50;
