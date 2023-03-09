@@ -27,6 +27,7 @@ const EditGraphQLSubsetPopup = ({
   );
 
   const [formData, setFormData] = useState({
+    description: graphQLSubset.description,
     name: graphQLSubset.name,
     graphQLSchema: graphQLSubset.graphQLSchema,
   });
@@ -60,7 +61,7 @@ const EditGraphQLSubsetPopup = ({
         </Header>
       }
     >
-      <div className="flex flex-col p-2">
+      <div className="flex flex-col space-y-4 p-4">
         <Input
           type="text"
           name="name"
@@ -74,6 +75,18 @@ const EditGraphQLSubsetPopup = ({
           }}
           className="mb-3"
           placeholder="GraphQLSubset Name"
+        />
+        <Textarea
+          onChange={(event) => {
+            setFormData(
+              produce(formData, (draft) => {
+                draft.description = event.detail.value;
+              })
+            );
+          }}
+          name="description"
+          value={formData.description}
+          placeholder="GraphQL Subset Description"
         />
         <Textarea
           onChange={(event) => {

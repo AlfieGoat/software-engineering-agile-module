@@ -22,6 +22,7 @@ const CreateNewGraphQLSubsetPopup = ({
   const graphQLSubsetCreateMutation = api.graphQLSubset.create.useMutation({});
 
   const [formData, setFormData] = useState({
+    description: "",
     name: "",
     graphQLSchema: "",
   });
@@ -52,7 +53,7 @@ const CreateNewGraphQLSubsetPopup = ({
         </Header>
       }
     >
-      <div className="flex flex-col p-2">
+      <div className="flex flex-col space-y-4 p-2">
         <Input
           type="text"
           name="name"
@@ -64,8 +65,19 @@ const CreateNewGraphQLSubsetPopup = ({
               })
             );
           }}
-          className="mb-3"
           placeholder="GraphQLSubset Name"
+        />
+        <Textarea
+          onChange={(event) => {
+            setFormData(
+              produce(formData, (draft) => {
+                draft.description = event.detail.value;
+              })
+            );
+          }}
+          name="description"
+          value={formData.description}
+          placeholder="GraphQL Subset Description"
         />
         <Textarea
           onChange={(event) => {

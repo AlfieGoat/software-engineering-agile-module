@@ -85,7 +85,7 @@ const Home: NextPage = () => {
                   },
                   {
                     id: "description",
-                    header: "description",
+                    header: "Description",
                     content: (e) => e.description,
                   },
                   {

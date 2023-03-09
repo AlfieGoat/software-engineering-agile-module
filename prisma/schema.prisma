@@ -19,7 +19,7 @@ model GraphQLSubset {
     createdAt     DateTime  @default(now())
     graphQLSchema String    @db.Text
     name          String
-    description   String?   @db.Text
+    description   String    @db.Text
     products      Product[]
 }
 
@@ -28,6 +28,7 @@ model Product {
     createdAt     DateTime        @default(now())
     graphQLSchema String          @db.Text
     name          String
+    description   String          @db.Text
     customers     Customer[]
     subsets       GraphQLSubset[]
 }

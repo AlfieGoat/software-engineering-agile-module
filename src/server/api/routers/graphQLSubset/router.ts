@@ -9,7 +9,7 @@ const DEFAULT_PAGE_SIZE = 50;
 const MAX_PAGE_SIZE = 100;
 
 const NAME_SCHEMA = z.string().min(4).max(80);
-const DESCRIPTION_SCHEMA = z.string().min(1).max(1000).optional();
+const DESCRIPTION_SCHEMA = z.string().min(1).max(1000);
 
 export const graphQLSubsetRouter = createTRPCRouter({
   create: protectedAdminProcedure
@@ -111,6 +111,7 @@ export const graphQLSubsetRouter = createTRPCRouter({
                   graphQLSubsets: product.subsets.map((subset) => ({
                     id: subset.id,
                   })),
+                  description: product.description,
                   name: product.name,
                 },
                 productId: product.id,

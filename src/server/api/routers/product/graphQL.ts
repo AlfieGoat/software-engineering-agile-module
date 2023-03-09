@@ -49,6 +49,7 @@ export const updateProduct = async (
   return tx.product.update({
     where: { id: productUpdateData.productId },
     data: {
+      description: productUpdateData.editedProduct.description,
       graphQLSchema: mergedSchemasSdl,
       name: productUpdateData.editedProduct.name,
       subsets: { set: productUpdateData.editedProduct.graphQLSubsets },

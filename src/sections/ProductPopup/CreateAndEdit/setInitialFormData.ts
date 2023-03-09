@@ -17,6 +17,6 @@ export function setInitialFormData(
       }, formData)
     );
   } else if (props.type === "Create") {
-    setFormData({ name: "", graphQLSubsetIds: [] });
+    setFormData({ description: "", name: "", graphQLSubsetIds: [] });
   }
 }

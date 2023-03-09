@@ -83,6 +83,11 @@ const Home: NextPage = () => {
                     content: (e: GraphQLSubset) => e.createdAt.toLocaleString(),
                   },
                   {
+                    id: "description",
+                    header: "Description",
+                    content: (e) => e.description,
+                  },
+                  {
                     id: "schema",
                     header: "Schema",
                     content: (e: GraphQLSubset) => (
@@ -98,7 +103,7 @@ const Home: NextPage = () => {
               loadingText="Loading GraphQL Subsets..."
               selectionType="multi"
               trackBy="id"
-              visibleSections={["createdAt", "schema"]}
+              visibleSections={["createdAt", "schema", "description"]}
               empty={
                 <Box textAlign="center" color="inherit">
                   <b>No resources</b>

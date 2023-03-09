@@ -9,10 +9,12 @@ const DEFAULT_PAGE_SIZE = 50;
 const MAX_PAGE_SIZE = 100;
 
 export const NAME_SCHEMA = z.string().min(4).max(80);
+const DESCRIPTION_SCHEMA = z.string().min(1).max(1000);
 
 export const UpdateProductInputSchema = z.object({
   productId: z.string(),
   editedProduct: z.object({
+    description: DESCRIPTION_SCHEMA,
     graphQLSubsets: z.array(z.object({ id: z.string() })).min(1),
     name: NAME_SCHEMA,
   }),
@@ -22,6 +24,7 @@ export const productRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
+        description: DESCRIPTION_SCHEMA,
         name: NAME_SCHEMA,
         graphQLSubsets: z.array(z.object({ id: z.string() })).min(1),
       })
@@ -40,6 +43,7 @@ export const productRouter = createTRPCRouter({
 
       const product = await ctx.prisma.product.create({
         data: {
+          description: input.description,
           name: input.name,
           graphQLSchema: mergedSchemasSdl,
           subsets: { connect: input.graphQLSubsets },

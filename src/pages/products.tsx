@@ -85,6 +85,11 @@ const Home: NextPage = () => {
                     content: (e) => e.createdAt.toLocaleString(),
                   },
                   {
+                    id: "description",
+                    header: "Description",
+                    content: (e) => e.description,
+                  },
+                  {
                     id: "graphQLSubsets",
                     header: "GraphQL Subsets",
                     content: (e) =>
@@ -108,7 +113,7 @@ const Home: NextPage = () => {
               loadingText="Loading Products..."
               selectionType="multi"
               trackBy="id"
-              visibleSections={["createdAt", "graphQLSubsets", "graphQLSchema"]}
+              visibleSections={["createdAt", "graphQLSubsets", "graphQLSchema", "description"]}
               empty={
                 <Box textAlign="center" color="inherit">
                   <b>No resources</b>

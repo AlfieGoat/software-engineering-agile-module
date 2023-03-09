@@ -4,6 +4,7 @@ import {
   Header,
   Icon,
   Input,
+  Textarea,
 } from "@cloudscape-design/components";
 import { GraphQLSubset, Product } from "@prisma/client";
 import produce from "immer";
@@ -80,7 +81,7 @@ const ProductPopup = (props: CreateNewProductsProps | EditProductsProps) => {
       }
     >
       <div
-        className={`flex flex-col p-2 ${
+        className={`flex flex-col space-y-4 p-2 ${
           graphQLSubsetComponentLoading ? "none" : ""
         }`}
       >
@@ -95,8 +96,19 @@ const ProductPopup = (props: CreateNewProductsProps | EditProductsProps) => {
               })
             );
           }}
-          className="mb-3"
           placeholder="Product Name"
+        />
+        <Textarea
+          onChange={(event) => {
+            setFormData(
+              produce(formData, (draft) => {
+                draft.description = event.detail.value;
+              })
+            );
+          }}
+          name="description"
+          value={formData.description}
+          placeholder="Product Description"
         />
         <SubsetSelection />
       </div>

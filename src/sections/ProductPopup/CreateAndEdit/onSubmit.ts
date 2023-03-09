@@ -10,6 +10,7 @@ export const onSubmit = async (
 ) => {
   if (props.type === "Create") {
     await productCreateMutation.mutateAsync({
+      description: formData.description,
       name: formData.name,
       graphQLSubsets: formData.graphQLSubsetIds.map((graphQLSubsetId) => ({
         id: graphQLSubsetId,
@@ -19,6 +20,7 @@ export const onSubmit = async (
     await productUpdateMutation.mutateAsync({
       productId: props.productToEdit.id,
       editedProduct: {
+        description: formData.description,
         name: formData.name,
         graphQLSubsets: formData.graphQLSubsetIds.map((graphQLSubsetId) => ({
           id: graphQLSubsetId,
