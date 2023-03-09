@@ -13,8 +13,8 @@ import { type GraphQLSubset } from "@prisma/client";
 import CreateNewGraphQLSubsetPopup from "~/sections/CreateNewGraphQLSubset";
 import CustomHead from "~/sections/CustomHead";
 import EditGraphQLSubsetPopup from "~/sections/EditGraphQLSubset";
-import { api } from "~/utils/api";
 import HomeButton from "~/sections/HomeButton";
+import { api } from "~/utils/api";
 
 const PAGE_SIZE = 8;
 
@@ -101,7 +101,13 @@ const Home: NextPage = () => {
                   <Box padding={{ bottom: "s" }} variant="p" color="inherit">
                     No resources to display.
                   </Box>
-                  <Button>Create resource</Button>
+                  <Button
+                    onClick={() => {
+                      setPopupState({ state: "Create" });
+                    }}
+                  >
+                    Create resource
+                  </Button>
                 </Box>
               }
               filter={
@@ -173,7 +179,7 @@ const Home: NextPage = () => {
                     </SpaceBetween>
                   }
                 >
-                  <HomeButton/>
+                  <HomeButton />
                   GraphQL Subsets
                 </Header>
               }

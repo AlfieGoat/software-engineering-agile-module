@@ -15,7 +15,7 @@ import { formDataAtom, productComponentLoadingAtom } from "./atoms";
 import { Content } from "./Content";
 import { onSubmit } from "./onSubmit";
 import { ProductSelection } from "./ProductSelection";
-import { setFormDataToProductToEdit as setInitialFormData } from "./setFormDataToProductToEdit";
+import { setInitialFormData } from "./setInitialFormData";
 
 export const PAGE_SIZE = 8;
 

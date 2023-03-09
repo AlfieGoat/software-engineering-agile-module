@@ -2,7 +2,7 @@ import produce from "immer";
 import { FormData } from "./atoms";
 import { CreateNewCustomerProps, EditCustomerProps } from "./index";
 
-export function setFormDataToProductToEdit(
+export function setInitialFormData(
   props: CreateNewCustomerProps | EditCustomerProps,
   setFormData: (args_0: FormData | ((prev: FormData) => FormData)) => void,
   formData: FormData

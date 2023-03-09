@@ -110,7 +110,13 @@ const Home: NextPage = () => {
                   <Box padding={{ bottom: "s" }} variant="p" color="inherit">
                     No resources to display.
                   </Box>
-                  <Button>Create resource</Button>
+                  <Button
+                    onClick={() => {
+                      setPopupState({ state: "Create" });
+                    }}
+                  >
+                    Create resource
+                  </Button>
                 </Box>
               }
               filter={

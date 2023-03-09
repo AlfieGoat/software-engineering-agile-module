@@ -13,7 +13,7 @@ import { api } from "~/utils/api";
 import { formDataAtom, graphQLSubsetComponentLoadingAtom } from "./atoms";
 import { Content } from "./Content";
 import { onSubmit } from "./onSubmit";
-import { setFormDataToProductToEdit } from "./setFormDataToProductToEdit";
+import { setInitialFormData } from "./setInitialFormData";
 import { SubsetSelection } from "./SubsetSelection";
 
 export const PAGE_SIZE = 8;
@@ -43,7 +43,7 @@ const ProductPopup = (props: CreateNewProductsProps | EditProductsProps) => {
   const [formData, setFormData] = useAtom(formDataAtom);
 
   useEffect(() => {
-    setFormDataToProductToEdit(props, setFormData, formData);
+    setInitialFormData(props, setFormData, formData);
   }, []);
 
   const [graphQLSubsetComponentLoading] = useAtom(
