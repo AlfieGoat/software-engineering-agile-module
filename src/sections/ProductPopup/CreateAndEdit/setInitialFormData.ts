@@ -13,6 +13,7 @@ export function setInitialFormData(
         draft.graphQLSubsetIds = props.productToEdit.subsets.map(
           (graphQLSubset) => graphQLSubset.id
         );
+        draft.description = props.productToEdit.description;
         draft.name = props.productToEdit.name;
       }, formData)
     );
