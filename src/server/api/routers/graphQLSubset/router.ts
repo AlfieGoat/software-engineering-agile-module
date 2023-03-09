@@ -58,6 +58,7 @@ export const graphQLSubsetRouter = createTRPCRouter({
         orderBy: {
           createdAt: "asc",
         },
+        include: {products: true}
       });
       let nextCursor: typeof cursor | undefined = undefined;
       if (items.length > limit) {

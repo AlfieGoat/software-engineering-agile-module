@@ -9,8 +9,9 @@ import Pagination from "@cloudscape-design/components/pagination";
 import TextFilter from "@cloudscape-design/components/text-filter";
 
 import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
-import { type GraphQLSubset } from "@prisma/client";
+import { Product, type GraphQLSubset } from "@prisma/client";
 import CreateNewGraphQLSubsetPopup from "~/sections/CreateNewGraphQLSubset";
+import CustomerProduct from "~/sections/Customer/CustomersProduct";
 import CustomHead from "~/sections/CustomHead";
 import EditGraphQLSubsetPopup from "~/sections/EditGraphQLSubset";
 import HomeButton from "~/sections/HomeButton";
@@ -44,7 +45,9 @@ const Home: NextPage = () => {
     api.graphQLSubset.deleteById.useMutation();
 
   const [selectedGraphQLSubset, setSelectedGraphQLSubset] = useState<
-    GraphQLSubset[]
+    (GraphQLSubset & {
+      products: Product[];
+    })[]
   >([]);
 
   const [showChild, setShowChild] = useState(false);
@@ -80,12 +83,25 @@ const Home: NextPage = () => {
                   {
                     id: "createdAt",
                     header: "Created At",
-                    content: (e: GraphQLSubset) => e.createdAt.toLocaleString(),
+                    content: (e) => e.createdAt.toLocaleString(),
                   },
                   {
                     id: "description",
                     header: "Description",
                     content: (e) => e.description,
+                  },
+                  {
+                    id: "products",
+                    header: "Products using this subset",
+                    content: (e) =>
+                      e.products.map((product) => (
+                        <li className="list-inside list-disc">
+                          <CustomerProduct
+                            productId={product.id}
+                            productName={product.name}
+                          />
+                        </li>
+                      )),
                   },
                   {
                     id: "schema",
@@ -103,7 +119,12 @@ const Home: NextPage = () => {
               loadingText="Loading GraphQL Subsets..."
               selectionType="multi"
               trackBy="id"
-              visibleSections={["createdAt", "schema", "description"]}
+              visibleSections={[
+                "createdAt",
+                "schema",
+                "description",
+                "products",
+              ]}
               empty={
                 <Box textAlign="center" color="inherit">
                   <b>No resources</b>

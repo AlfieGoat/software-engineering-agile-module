@@ -26,7 +26,7 @@ const ViewProductPopup = ({ closePopup, product }: ViewProductPopupProps) => {
         <SubsetDisplay subsets={product.subsets} />
         <div>
           <Header variant="h3">Product Schema</Header>
-          <div className="whitespace-pre-wrap">{product.graphQLSchema}</div>
+          <div className="whitespace-pre-wrap p-1">{product.graphQLSchema}</div>
         </div>
       </div>
     </div>
