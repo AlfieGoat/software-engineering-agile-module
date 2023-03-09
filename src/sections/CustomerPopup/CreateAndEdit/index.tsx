@@ -79,7 +79,7 @@ const CustomerPopup = (props: CreateNewCustomerProps | EditCustomerProps) => {
       }
     >
       <div
-        className={`flex flex-col p-2 ${
+        className={`flex flex-col space-y-4 p-2 ${
           productSubsetComponentLoading ? "none" : ""
         }`}
       >
