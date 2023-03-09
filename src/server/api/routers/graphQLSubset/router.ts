@@ -99,7 +99,7 @@ export const graphQLSubsetRouter = createTRPCRouter({
           data: {
             graphQLSchema: input.editedGraphQLSubset.graphQLSchema,
             name: input.editedGraphQLSubset.name,
-            description: input.editedGraphQLSubset.graphQLSchema,
+            description: input.editedGraphQLSubset.description,
           },
         });
 

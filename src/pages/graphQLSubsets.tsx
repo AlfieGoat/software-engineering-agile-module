@@ -143,12 +143,6 @@ const Home: NextPage = () => {
                   actions={
                     <SpaceBetween size="xs" direction="horizontal">
                       <Button
-                        data-testid="header-btn-view-details"
-                        disabled={selectedGraphQLSubset.length !== 1}
-                      >
-                        View details
-                      </Button>
-                      <Button
                         data-testid="header-btn-edit"
                         disabled={selectedGraphQLSubset.length !== 1}
                         onClick={() => {
