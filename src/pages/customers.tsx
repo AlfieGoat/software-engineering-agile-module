@@ -10,7 +10,8 @@ import TextFilter from "@cloudscape-design/components/text-filter";
 
 import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
 import { Customer, Product } from "@prisma/client";
-import CustomerPopup from "~/sections/CustomerPopup/index";
+import CustomerProduct from "~/sections/Customer/CustomersProduct";
+import CustomerPopup from "~/sections/CustomerPopup/CreateAndEdit/index";
 import CustomHead from "~/sections/CustomHead";
 import HomeButton from "~/sections/HomeButton";
 import { api } from "~/utils/api";
@@ -91,9 +92,10 @@ const Home: NextPage = () => {
                     id: "product",
                     header: "Product",
                     content: (e) => (
-                      <div className="whitespace-pre-wrap">
-                        {e.product.name}
-                      </div>
+                      <CustomerProduct
+                        productId={e.product.id}
+                        productName={e.product.name}
+                      />
                     ),
                   },
                 ],
@@ -142,12 +144,6 @@ const Home: NextPage = () => {
                   }
                   actions={
                     <SpaceBetween size="xs" direction="horizontal">
-                      <Button
-                        data-testid="header-btn-view-details"
-                        disabled={selectedCustomers.length !== 1}
-                      >
-                        View details
-                      </Button>
                       <Button
                         data-testid="header-btn-edit"
                         disabled={selectedCustomers.length !== 1}

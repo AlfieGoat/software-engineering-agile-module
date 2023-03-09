@@ -12,7 +12,7 @@ import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
 import { GraphQLSubset, Product } from "@prisma/client";
 import CustomHead from "~/sections/CustomHead";
 import HomeButton from "~/sections/HomeButton";
-import ProductPopup from "~/sections/ProductPopup/index";
+import ProductPopup from "~/sections/ProductPopup/CreateAndEdit/index";
 import { api } from "~/utils/api";
 
 const PAGE_SIZE = 8;
@@ -147,12 +147,6 @@ const Home: NextPage = () => {
                   }
                   actions={
                     <SpaceBetween size="xs" direction="horizontal">
-                      <Button
-                        data-testid="header-btn-view-details"
-                        disabled={selectedProducts.length !== 1}
-                      >
-                        View details
-                      </Button>
                       <Button
                         data-testid="header-btn-edit"
                         disabled={selectedProducts.length !== 1}

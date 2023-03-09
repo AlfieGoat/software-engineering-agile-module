@@ -54,6 +54,7 @@ export const productRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const product = await ctx.prisma.product.findUnique({
         where: { id: input.productId },
+        include: { subsets: true },
       });
 
       return product;
@@ -112,7 +113,7 @@ export const productRouter = createTRPCRouter({
           message:
             "You cannot delete a Product that is still associated with Customers.",
         });
-      
+
       await ctx.prisma.product.delete({
         where: { id: input.productId },
       });
