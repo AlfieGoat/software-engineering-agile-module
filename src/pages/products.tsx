@@ -14,6 +14,7 @@ import CustomHead from "~/sections/CustomHead";
 import HomeButton from "~/sections/HomeButton";
 import ProductPopup from "~/sections/ProductPopup/CreateAndEdit/index";
 import { api } from "~/utils/api";
+import SubsetDisplay from "~/sections/ProductPopup/view/SubsetDisplay";
 
 const PAGE_SIZE = 8;
 
@@ -93,9 +94,7 @@ const Home: NextPage = () => {
                     id: "graphQLSubsets",
                     header: "GraphQL Subsets",
                     content: (e) =>
-                      e.subsets.map((subset) => (
-                        <li className="list-inside list-disc">{subset.name}</li>
-                      )),
+                      <SubsetDisplay subsets={e.subsets}/>
                   },
                   {
                     id: "graphQLSchema",
