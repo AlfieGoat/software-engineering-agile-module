@@ -9,10 +9,10 @@ import Pagination from "@cloudscape-design/components/pagination";
 import TextFilter from "@cloudscape-design/components/text-filter";
 
 import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
-import { GraphQLSubset, Customer } from "@prisma/client";
+import { Customer, Product } from "@prisma/client";
+import CustomerPopup from "~/sections/CustomerPopup/index";
 import CustomHead from "~/sections/CustomHead";
 import HomeButton from "~/sections/HomeButton";
-import CustomerPopup from "~/sections/CustomerPopup/index";
 import { api } from "~/utils/api";
 
 const PAGE_SIZE = 8;
@@ -42,11 +42,9 @@ const Home: NextPage = () => {
   const customersDeleteMutation = api.customer.deleteById.useMutation();
 
   const [selectedCustomers, setSelectedCustomers] = useState<
-    Array<
-      Customer & {
-        subsets: GraphQLSubset[];
-      }
-    >
+    (Customer & {
+      product: Product;
+    })[]
   >([]);
 
   const [showChild, setShowChild] = useState(false);
@@ -85,19 +83,16 @@ const Home: NextPage = () => {
                     content: (e) => e.createdAt.toLocaleString(),
                   },
                   {
-                    id: "graphQLSubsets",
-                    header: "GraphQL Subsets",
-                    content: (e) =>
-                      e.subsets.map((subset) => (
-                        <li className="list-inside list-disc">{subset.name}</li>
-                      )),
+                    id: "description",
+                    header: "description",
+                    content: (e) => e.description,
                   },
                   {
-                    id: "graphQLSchema",
-                    header: "GraphQL Schema",
+                    id: "product",
+                    header: "Product",
                     content: (e) => (
                       <div className="whitespace-pre-wrap">
-                        {e.graphQLSchema}
+                        {e.product.name}
                       </div>
                     ),
                   },
@@ -108,7 +103,7 @@ const Home: NextPage = () => {
               loadingText="Loading Customers..."
               selectionType="multi"
               trackBy="id"
-              visibleSections={["createdAt", "graphQLSubsets", "graphQLSchema"]}
+              visibleSections={["createdAt", "description", "product"]}
               empty={
                 <Box textAlign="center" color="inherit">
                   <b>No resources</b>

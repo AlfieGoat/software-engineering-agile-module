@@ -57,6 +57,7 @@ export const customerRouter = createTRPCRouter({
         orderBy: {
           createdAt: "asc",
         },
+        include: { product: true },
       });
       let nextCursor: typeof cursor | undefined = undefined;
       if (items.length > limit) {
