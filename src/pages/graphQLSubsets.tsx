@@ -85,7 +85,11 @@ const Home: NextPage = () => {
                   {
                     id: "schema",
                     header: "Schema",
-                    content: (e: GraphQLSubset) => e.graphQLSchema,
+                    content: (e: GraphQLSubset) => (
+                      <div className="whitespace-pre-wrap">
+                        {e.graphQLSchema}
+                      </div>
+                    ),
                   },
                 ],
               }}
