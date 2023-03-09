@@ -1,11 +1,12 @@
 import { Icon } from "@cloudscape-design/components";
 import Header from "@cloudscape-design/components/header";
-import { GraphQLSubset, Product } from "@prisma/client";
+import { Customer, GraphQLSubset, Product } from "@prisma/client";
 import SubsetDisplay from "./SubsetDisplay";
 
 interface ViewProductPopupProps {
   product: Product & {
     subsets: GraphQLSubset[];
+    customers: Customer[];
   };
   closePopup: () => void;
 }
@@ -22,11 +23,23 @@ const ViewProductPopup = ({ closePopup, product }: ViewProductPopupProps) => {
             <Icon variant="link" name="close" />
           </button>
         </div>
-        <Header variant="h3">Product GraphQL Subsets</Header>
-        <SubsetDisplay subsets={product.subsets} />
+        <div>
+          <Header variant="h3">Product GraphQL Subsets</Header>
+          <SubsetDisplay subsets={product.subsets} />
+        </div>
+        <div>
+          <Header variant="h3">Customers</Header>
+            {product.customers.map((customer) => (
+              <div className="rounded-xl border-2 p-2">
+                <span className="font-bold">{customer.name} - </span>
+
+                <span className="text-gray-700">{customer.description}</span>
+              </div>
+            ))}
+        </div>
         <div>
           <Header variant="h3">Product Schema</Header>
-          <div className="whitespace-pre-wrap p-1">{product.graphQLSchema}</div>
+          <div className="whitespace-pre-wrap rounded-xl border-2 p-2">{product.graphQLSchema}</div>
         </div>
       </div>
     </div>

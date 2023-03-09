@@ -58,7 +58,7 @@ export const productRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const product = await ctx.prisma.product.findUnique({
         where: { id: input.productId },
-        include: { subsets: true },
+        include: { subsets: true,customers: true },
       });
 
       return product;
