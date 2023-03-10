@@ -14,6 +14,12 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+model SourceGraphQLSchema {
+    id            String   @id @default(cuid())
+    createdAt     DateTime @default(now())
+    graphQLSchema String   @db.Text
+}
+
 model GraphQLSubset {
     id            String    @id @default(cuid())
     createdAt     DateTime  @default(now())
