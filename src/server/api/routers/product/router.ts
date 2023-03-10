@@ -80,7 +80,7 @@ export const productRouter = createTRPCRouter({
         orderBy: {
           createdAt: "asc",
         },
-        include: { subsets: true },
+        include: { subsets: true, customers: true },
       });
       let nextCursor: typeof cursor | undefined = undefined;
       if (items.length > limit) {

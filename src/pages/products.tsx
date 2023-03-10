@@ -9,12 +9,13 @@ import Pagination from "@cloudscape-design/components/pagination";
 import TextFilter from "@cloudscape-design/components/text-filter";
 
 import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
-import { GraphQLSubset, Product } from "@prisma/client";
+import { Customer, GraphQLSubset, Product } from "@prisma/client";
 import CustomHead from "~/sections/CustomHead";
 import HomeButton from "~/sections/HomeButton";
 import ProductPopup from "~/sections/ProductPopup/CreateAndEdit/index";
 import { api } from "~/utils/api";
 import SubsetDisplay from "~/sections/ProductPopup/view/SubsetDisplay";
+import CustomersDisplay from "~/sections/ProductPopup/view/CustomersDisplay";
 
 const PAGE_SIZE = 8;
 
@@ -46,6 +47,7 @@ const Home: NextPage = () => {
     Array<
       Product & {
         subsets: GraphQLSubset[];
+        customers: Customer[];
       }
     >
   >([]);
@@ -91,6 +93,11 @@ const Home: NextPage = () => {
                     content: (e) => e.description,
                   },
                   {
+                    id:"customers",
+                    header: "Customers",
+                    content: (e) => <CustomersDisplay customers={e.customers}/>
+                  },
+                  {
                     id: "graphQLSubsets",
                     header: "GraphQL Subsets",
                     content: (e) =>
@@ -112,7 +119,7 @@ const Home: NextPage = () => {
               loadingText="Loading Products..."
               selectionType="multi"
               trackBy="id"
-              visibleSections={["createdAt", "graphQLSubsets", "graphQLSchema", "description"]}
+              visibleSections={["createdAt", "graphQLSubsets", "graphQLSchema", "description", "customers"]}
               empty={
                 <Box textAlign="center" color="inherit">
                   <b>No resources</b>
