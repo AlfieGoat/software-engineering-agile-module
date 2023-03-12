@@ -5,6 +5,7 @@ import ContentLayout from "@cloudscape-design/components/content-layout";
 import Header from "@cloudscape-design/components/header";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import { useEffect, useState } from "react";
+import CustomHead from "~/sections/CustomHead";
 import HomeButton from "~/sections/HomeButton";
 
 import { api } from "~/utils/api";
@@ -23,56 +24,59 @@ export default () => {
   }
 
   return (
-    <ContentLayout
-      header={
-        <div className="p-4">
-          <SpaceBetween size="m">
-            <Header
-              variant="h1"
-              description="This is the source of truth schema. It is the superset of every GraphQL Subset."
-              actions={
-                <Button
-                  variant="primary"
-                  onClick={() => {
-                    setShowUpdateSchemaPopup(true);
-                  }}
-                >
-                  Update Schema
-                </Button>
-              }
-            >
-              <HomeButton />
-              Source GraphQL Schema
-            </Header>
-          </SpaceBetween>
+    <>
+      <CustomHead />
+      <ContentLayout
+        header={
+          <div className="p-4">
+            <SpaceBetween size="m">
+              <Header
+                variant="h1"
+                description="This is the source of truth schema. It is the superset of every GraphQL Subset."
+                actions={
+                  <Button
+                    variant="primary"
+                    onClick={() => {
+                      setShowUpdateSchemaPopup(true);
+                    }}
+                  >
+                    Update Schema
+                  </Button>
+                }
+              >
+                <HomeButton />
+                Source GraphQL Schema
+              </Header>
+            </SpaceBetween>
+          </div>
+        }
+      >
+        <div className="space-y-8">
+          <Container header={<Header variant="h2">Schema</Header>}>
+            {sourceGraphQLSchema.isLoading && (
+              <p className="font-bold">Loading...</p>
+            )}
+            {!!sourceGraphQLSchema.data ? (
+              <div>{sourceGraphQLSchema.data.graphQLSchema}</div>
+            ) : (
+              <p className="font-bold">
+                No Source GraphQL Schema exists. Create one?
+              </p>
+            )}
+          </Container>
+          {sourceGraphQLSchema.data && (
+            <CompareLatestSourceGraphQLSchemaWithSubsets />
+          )}
         </div>
-      }
-    >
-      <div className="space-y-8">
-        <Container header={<Header variant="h2">Schema</Header>}>
-          {sourceGraphQLSchema.isLoading && (
-            <p className="font-bold">Loading...</p>
-          )}
-          {!!sourceGraphQLSchema.data ? (
-            <div>{sourceGraphQLSchema.data.graphQLSchema}</div>
-          ) : (
-            <p className="font-bold">
-              No Source GraphQL Schema exists. Create one?
-            </p>
-          )}
-        </Container>
-        {sourceGraphQLSchema.data && (
-          <CompareLatestSourceGraphQLSchemaWithSubsets />
+        {showUpdateSchemaPopup && (
+          <UpdateSchemaPopup
+            closePopup={() => {
+              setShowUpdateSchemaPopup(false);
+            }}
+          />
         )}
-      </div>
-      {showUpdateSchemaPopup && (
-        <UpdateSchemaPopup
-          closePopup={() => {
-            setShowUpdateSchemaPopup(false);
-          }}
-        />
-      )}
-    </ContentLayout>
+      </ContentLayout>
+    </>
   );
 };
 
@@ -88,6 +92,7 @@ const CompareLatestSourceGraphQLSchemaWithSubsets = () => {
       {!!compareLatestSourceGraphQLSchemaWithSubsets.data ? (
         <div className="whitespace-pre">
           {
+            // split by "added" to remove unnecessary diffs
             compareLatestSourceGraphQLSchemaWithSubsets.data.diffNoColor.split(
               "added"
             )[1]
