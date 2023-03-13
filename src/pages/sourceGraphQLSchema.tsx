@@ -1,4 +1,4 @@
-import { Textarea } from "@cloudscape-design/components";
+import { Icon, Textarea } from "@cloudscape-design/components";
 import Button from "@cloudscape-design/components/button";
 import Container from "@cloudscape-design/components/container";
 import ContentLayout from "@cloudscape-design/components/content-layout";
@@ -51,13 +51,15 @@ export default () => {
           </div>
         }
       >
-        <div className="space-y-8">
+        <div className="space-y-8 px-8 pb-8">
           <Container header={<Header variant="h2">Schema</Header>}>
             {sourceGraphQLSchema.isLoading && (
               <p className="font-bold">Loading...</p>
             )}
             {!!sourceGraphQLSchema.data ? (
-              <div>{sourceGraphQLSchema.data.graphQLSchema}</div>
+              <div className="whitespace-pre">
+                {sourceGraphQLSchema.data.graphQLSchema}
+              </div>
             ) : (
               <p className="font-bold">
                 No Source GraphQL Schema exists. Create one?
