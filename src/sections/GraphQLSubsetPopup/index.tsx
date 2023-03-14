@@ -16,7 +16,6 @@ import { Content } from "./Content";
 import { onSubmit } from "./onSubmit";
 import { setInitialFormData } from "./setInitialFormData";
 
-import "./graphiql-explorer.d.ts";
 import { SchemaExplorer } from "../SchemaExplorer";
 
 export interface CreateNewGraphQLSubsetsProps {

@@ -16,6 +16,7 @@ import ProductPopup from "~/sections/ProductPopup/CreateAndEdit/index";
 import { api } from "~/utils/api";
 import SubsetDisplay from "~/sections/ProductPopup/view/SubsetDisplay";
 import CustomersDisplay from "~/sections/ProductPopup/view/CustomersDisplay";
+import { SchemaExplorer } from "~/sections/SchemaExplorer";
 
 const PAGE_SIZE = 8;
 
@@ -112,6 +113,13 @@ const Home: NextPage = () => {
                       </div>
                     ),
                   },
+                  {
+                    id: "schemaExplorer",
+                    header:"Product Schema Explorer",
+                    content: (e) => <div>
+                      <SchemaExplorer schema={e.graphQLSchema}/>
+                    </div>
+                  }
                 ],
               }}
               cardsPerRow={[{ cards: 1 }, { minWidth: 500, cards: 2 }]}
@@ -119,7 +127,7 @@ const Home: NextPage = () => {
               loadingText="Loading Products..."
               selectionType="multi"
               trackBy="id"
-              visibleSections={["createdAt", "graphQLSubsets", "graphQLSchema", "description", "customers"]}
+              visibleSections={["createdAt", "graphQLSubsets", "graphQLSchema", "description", "customers", "schemaExplorer"]}
               empty={
                 <Box textAlign="center" color="inherit">
                   <b>No resources</b>

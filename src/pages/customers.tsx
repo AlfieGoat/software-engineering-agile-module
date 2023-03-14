@@ -15,6 +15,7 @@ import CustomerPopup from "~/sections/CustomerPopup/CreateAndEdit/index";
 import CustomHead from "~/sections/CustomHead";
 import HomeButton from "~/sections/HomeButton";
 import { api } from "~/utils/api";
+import { SchemaExplorer } from "~/sections/SchemaExplorer";
 
 const PAGE_SIZE = 8;
 
@@ -98,6 +99,13 @@ const Home: NextPage = () => {
                       />
                     ),
                   },
+                  {
+                    id: "schemaExplorer",
+                    header:"Product Schema Explorer",
+                    content: (e) => <div>
+                      <SchemaExplorer schema={e.product.graphQLSchema}/>
+                    </div>
+                  }
                 ],
               }}
               cardsPerRow={[{ cards: 1 }, { minWidth: 500, cards: 2 }]}
@@ -105,7 +113,7 @@ const Home: NextPage = () => {
               loadingText="Loading Customers..."
               selectionType="multi"
               trackBy="id"
-              visibleSections={["createdAt", "description", "product"]}
+              visibleSections={["createdAt", "description", "product", "schemaExplorer"]}
               empty={
                 <Box textAlign="center" color="inherit">
                   <b>No resources</b>
