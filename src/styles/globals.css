@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.doc-explorer-rhs {
+  display: none;
+}
+
+.graphiql-explorer-root {
+  font-family: var(--font-family-mono) !important;
+  font-size: var(--font-size-body) !important;
+  padding: 0 !important;
+}
+
+.graphiql-explorer-root > :last-child {
+  display: none !important;
+}
+
+.graphiql-explorer-root > :first-child {
+  overflow: visible !important;
+}
+
+.graphiql-operation-title-bar {
+  display: none;
+}

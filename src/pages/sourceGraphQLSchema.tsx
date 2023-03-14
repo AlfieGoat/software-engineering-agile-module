@@ -19,6 +19,8 @@ export default () => {
   useEffect(() => {
     setShowChild(true);
   }, []);
+
+  useEffect(() => {}, []);
   if (!showChild) {
     return null;
   }
@@ -118,15 +120,20 @@ function UpdateSchemaPopup({ closePopup }: { closePopup: () => void }) {
             variant="h2"
             description="Use this to update the source of truth schema."
             actions={
-              <Button
-                variant="primary"
-                onClick={() => {
-                  updateSchemaMutation.mutate({ graphQLSchema: newSchema });
-                  closePopup();
-                }}
-              >
-                Update schema
-              </Button>
+              <div className="flex space-x-4">
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    updateSchemaMutation.mutate({ graphQLSchema: newSchema });
+                    closePopup();
+                  }}
+                >
+                  Update schema
+                </Button>
+                <button className="self-center pr-2" onClick={closePopup}>
+                  <Icon variant="link" name="close" />
+                </button>
+              </div>
             }
           >
             Update Schema

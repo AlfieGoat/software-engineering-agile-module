@@ -1,20 +1,24 @@
 import {
-    Button,
-    Container,
-    Header,
-    Icon,
-    Input,
-    Textarea
+  Button,
+  Container,
+  Header,
+  Icon,
+  Input,
+  Textarea,
 } from "@cloudscape-design/components";
 import { GraphQLSubset } from "@prisma/client";
+import GraphiQLExplorer from "graphiql-explorer";
 import produce from "immer";
 import { useAtom } from "jotai";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
 import { formDataAtom } from "./atoms";
 import { Content } from "./Content";
 import { onSubmit } from "./onSubmit";
 import { setInitialFormData } from "./setInitialFormData";
+
+import { buildSchema } from "graphql";
+import "./graphiql-explorer.d.ts";
 
 export interface CreateNewGraphQLSubsetsProps {
   type: "Create";
@@ -31,18 +35,31 @@ export interface EditGraphQLSubsetPopupProps {
   removeSelected: () => void;
 }
 
-const GraphQLSubsetPopup = (props: CreateNewGraphQLSubsetsProps | EditGraphQLSubsetPopupProps) => {
+const GraphQLSubsetPopup = (
+  props: CreateNewGraphQLSubsetsProps | EditGraphQLSubsetPopupProps
+) => {
   const graphQLSubsetCreateMutation = api.graphQLSubset.create.useMutation({});
-  const graphQLSubsetUpdateMutation = api.graphQLSubset.updateById.useMutation({});
+  const graphQLSubsetUpdateMutation = api.graphQLSubset.updateById.useMutation(
+    {}
+  );
+  const sourceGraphQLSchema = api.sourceGraphQLSchema.getLatest.useQuery();
 
-  const {buttonText, headingText} = Content[props.type];
-  
+  const { buttonText, headingText } = Content[props.type];
+
   const [formData, setFormData] = useAtom(formDataAtom);
 
   useEffect(() => {
     setInitialFormData(props, setFormData, formData);
   }, []);
 
+  const [query, setQuery] = useState("{}");
+
+  const extractMinimumGraphQLSchemaFromQuery =
+    api.sourceGraphQLSchema.extractMinimumGraphQLSchemaFromQuery.useMutation(
+      {}
+    );
+
+  if (sourceGraphQLSchema.isLoading || !sourceGraphQLSchema.data) return <></>;
 
   return (
     <Container
@@ -52,7 +69,14 @@ const GraphQLSubsetPopup = (props: CreateNewGraphQLSubsetsProps | EditGraphQLSub
           actions={
             <div className="flex space-x-4">
               <Button
-                onClick={() => onSubmit(formData, props, graphQLSubsetCreateMutation, graphQLSubsetUpdateMutation)}
+                onClick={() =>
+                  onSubmit(
+                    formData,
+                    props,
+                    graphQLSubsetCreateMutation,
+                    graphQLSubsetUpdateMutation
+                  )
+                }
               >
                 {buttonText}
               </Button>
@@ -92,6 +116,42 @@ const GraphQLSubsetPopup = (props: CreateNewGraphQLSubsetsProps | EditGraphQLSub
           value={formData.description}
           placeholder="GraphQL Subset Description"
         />
+
+        <div className="rounded-xl border-2 border-gray-400 p-4">
+          <GraphiQLExplorer
+            query={query}
+            showAttribution={false}
+            explorerIsOpen={true}
+            schema={buildSchema(sourceGraphQLSchema.data.graphQLSchema)}
+            onEdit={async (query) => {
+                setQuery(query);
+                if(query.includes("Placeholder")) return;
+
+                try{
+                    const data =
+                    await extractMinimumGraphQLSchemaFromQuery.mutateAsync({
+                      query,
+                    });
+    
+                  setFormData(
+                    produce((draft) => {
+                      draft.graphQLSchema = data;
+                    }, formData)
+                  );
+                }
+                catch{
+                    setFormData(
+                        produce((draft) => {
+                          draft.graphQLSchema = "";
+                        }, formData)
+                      );
+                }
+
+            }}
+            title=""
+
+          />
+        </div>
         <Textarea
           onChange={(event) => {
             setFormData(
