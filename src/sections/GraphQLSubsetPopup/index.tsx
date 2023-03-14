@@ -1,36 +1,48 @@
 import {
-  Button,
-  Container,
-  Header,
-  Icon,
-  Input,
-  Textarea,
+    Button,
+    Container,
+    Header,
+    Icon,
+    Input,
+    Textarea
 } from "@cloudscape-design/components";
-import { type GraphQLSubset } from "@prisma/client";
+import { GraphQLSubset } from "@prisma/client";
 import produce from "immer";
-import { useState } from "react";
+import { useAtom } from "jotai";
+import { useEffect } from "react";
 import { api } from "~/utils/api";
+import { formDataAtom } from "./atoms";
+import { Content } from "./Content";
+import { onSubmit } from "./onSubmit";
+import { setInitialFormData } from "./setInitialFormData";
 
-interface EditGraphQLSubsetPopupProps {
-  refetchGraphQLSubsetsData: () => Promise<void>;
+export interface CreateNewGraphQLSubsetsProps {
+  type: "Create";
+  refetchGraphQLSubsetsData: (...args: any[]) => Promise<void>;
   closePopup: () => void;
-  graphQLSubset: GraphQLSubset;
+  removeSelected: () => void;
 }
 
-const EditGraphQLSubsetPopup = ({
-  refetchGraphQLSubsetsData,
-  closePopup,
-  graphQLSubset,
-}: EditGraphQLSubsetPopupProps) => {
-  const graphQLSubsetEditMutation = api.graphQLSubset.updateById.useMutation(
-    {}
-  );
+export interface EditGraphQLSubsetPopupProps {
+  type: "Edit";
+  refetchGraphQLSubsetsData: () => Promise<void>;
+  closePopup: () => void;
+  graphQLSubsetToEdit: GraphQLSubset;
+  removeSelected: () => void;
+}
 
-  const [formData, setFormData] = useState({
-    description: graphQLSubset.description,
-    name: graphQLSubset.name,
-    graphQLSchema: graphQLSubset.graphQLSchema,
-  });
+const GraphQLSubsetPopup = (props: CreateNewGraphQLSubsetsProps | EditGraphQLSubsetPopupProps) => {
+  const graphQLSubsetCreateMutation = api.graphQLSubset.create.useMutation({});
+  const graphQLSubsetUpdateMutation = api.graphQLSubset.updateById.useMutation({});
+
+  const {buttonText, headingText} = Content[props.type];
+  
+  const [formData, setFormData] = useAtom(formDataAtom);
+
+  useEffect(() => {
+    setInitialFormData(props, setFormData, formData);
+  }, []);
+
 
   return (
     <Container
@@ -40,28 +52,21 @@ const EditGraphQLSubsetPopup = ({
           actions={
             <div className="flex space-x-4">
               <Button
-                onClick={async () => {
-                  await graphQLSubsetEditMutation.mutateAsync({
-                    graphQLSubsetId: graphQLSubset.id,
-                    editedGraphQLSubset: { ...formData },
-                  });
-                  await refetchGraphQLSubsetsData();
-                  closePopup();
-                }}
+                onClick={() => onSubmit(formData, props, graphQLSubsetCreateMutation, graphQLSubsetUpdateMutation)}
               >
-                Edit GraphQLSubset
+                {buttonText}
               </Button>
-              <button className="self-center pr-2" onClick={closePopup}>
+              <button className="self-center pr-2" onClick={props.closePopup}>
                 <Icon variant="link" name="close" />
               </button>
             </div>
           }
         >
-          Edit GraphQLSubset
+          {headingText}
         </Header>
       }
     >
-      <div className="flex flex-col space-y-4 p-4">
+      <div className="flex flex-col space-y-4 p-2">
         <Input
           type="text"
           name="name"
@@ -73,7 +78,6 @@ const EditGraphQLSubsetPopup = ({
               })
             );
           }}
-          className="mb-3"
           placeholder="GraphQLSubset Name"
         />
         <Textarea
@@ -105,4 +109,4 @@ const EditGraphQLSubsetPopup = ({
   );
 };
 
-export default EditGraphQLSubsetPopup;
+export default GraphQLSubsetPopup;

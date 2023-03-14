@@ -10,10 +10,9 @@ import TextFilter from "@cloudscape-design/components/text-filter";
 
 import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
 import { Product, type GraphQLSubset } from "@prisma/client";
-import CreateNewGraphQLSubsetPopup from "~/sections/CreateNewGraphQLSubset";
 import CustomerProduct from "~/sections/Customer/CustomersProduct";
 import CustomHead from "~/sections/CustomHead";
-import EditGraphQLSubsetPopup from "~/sections/EditGraphQLSubset";
+import GraphQLSubsetPopup from "~/sections/GraphQLSubsetPopup";
 import HomeButton from "~/sections/HomeButton";
 import { api } from "~/utils/api";
 
@@ -232,26 +231,34 @@ const Home: NextPage = () => {
         />
         {popupState.state === "Create" && (
           <div className="absolute top-1/2 left-1/2 z-10 w-1/2 -translate-x-1/2 -translate-y-1/2 transform">
-            <CreateNewGraphQLSubsetPopup
+            <GraphQLSubsetPopup
+              type="Create"
+              closePopup={() => {
+                setPopupState({ state: "None" });
+              }}
               refetchGraphQLSubsetsData={
                 graphQLSubset.refetch as () => Promise<any>
               }
-              closePopup={() => {
-                setPopupState({ state: "None" });
+              removeSelected={() => {
+                setSelectedGraphQLSubset([]);
               }}
             />
           </div>
         )}
         {popupState.state === "Edit" && selectedGraphQLSubset[0] && (
           <div className="absolute top-1/2 left-1/2 z-10 w-1/2 -translate-x-1/2 -translate-y-1/2 transform">
-            <EditGraphQLSubsetPopup
-              refetchGraphQLSubsetsData={
-                graphQLSubset.refetch as () => Promise<any>
-              }
+            <GraphQLSubsetPopup
+              type="Edit"
               closePopup={() => {
                 setPopupState({ state: "None" });
               }}
-              graphQLSubset={{ ...selectedGraphQLSubset[0] }}
+              refetchGraphQLSubsetsData={
+                graphQLSubset.refetch as () => Promise<any>
+              }
+              removeSelected={() => {
+                setSelectedGraphQLSubset([]);
+              }}
+              graphQLSubsetToEdit={selectedGraphQLSubset[0]}
             />
           </div>
         )}
