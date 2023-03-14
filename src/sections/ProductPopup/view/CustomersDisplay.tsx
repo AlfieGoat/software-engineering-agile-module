@@ -2,6 +2,7 @@ import { Customer } from "@prisma/client";
 
 const CustomersDisplay = ({ customers }: { customers: Customer[] }) => (
   <>
+    {customers.length === 0 && <p>No customers on this product... </p>}
     {customers.map((customer) => (
       <div className="rounded-xl border-2 p-2">
         <span className="font-bold">{customer.name} - </span>
