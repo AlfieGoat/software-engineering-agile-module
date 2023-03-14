@@ -7,18 +7,17 @@ import {
   Textarea,
 } from "@cloudscape-design/components";
 import { GraphQLSubset } from "@prisma/client";
-import GraphiQLExplorer from "graphiql-explorer";
 import produce from "immer";
 import { useAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { api } from "~/utils/api";
 import { formDataAtom } from "./atoms";
 import { Content } from "./Content";
 import { onSubmit } from "./onSubmit";
 import { setInitialFormData } from "./setInitialFormData";
 
-import { buildSchema } from "graphql";
 import "./graphiql-explorer.d.ts";
+import { SchemaExplorer } from "../SchemaExplorer";
 
 export interface CreateNewGraphQLSubsetsProps {
   type: "Create";
@@ -42,24 +41,18 @@ const GraphQLSubsetPopup = (
   const graphQLSubsetUpdateMutation = api.graphQLSubset.updateById.useMutation(
     {}
   );
-  const sourceGraphQLSchema = api.sourceGraphQLSchema.getLatest.useQuery();
-
-  const { buttonText, headingText } = Content[props.type];
 
   const [formData, setFormData] = useAtom(formDataAtom);
-
-  useEffect(() => {
-    setInitialFormData(props, setFormData, formData);
-  }, []);
-
-  const [query, setQuery] = useState("{}");
-
   const extractMinimumGraphQLSchemaFromQuery =
     api.sourceGraphQLSchema.extractMinimumGraphQLSchemaFromQuery.useMutation(
       {}
     );
 
-  if (sourceGraphQLSchema.isLoading || !sourceGraphQLSchema.data) return <></>;
+  const { buttonText, headingText } = Content[props.type];
+
+  useEffect(() => {
+    setInitialFormData(props, setFormData, formData);
+  }, []);
 
   return (
     <Container
@@ -116,40 +109,29 @@ const GraphQLSubsetPopup = (
           value={formData.description}
           placeholder="GraphQL Subset Description"
         />
-
         <div className="rounded-xl border-2 border-gray-400 p-4">
-          <GraphiQLExplorer
-            query={query}
-            showAttribution={false}
-            explorerIsOpen={true}
-            schema={buildSchema(sourceGraphQLSchema.data.graphQLSchema)}
+          <SchemaExplorer
             onEdit={async (query) => {
-                setQuery(query);
-                if(query.includes("Placeholder")) return;
+              if (query.includes("Placeholder")) return;
+              try {
+                const data =
+                  await extractMinimumGraphQLSchemaFromQuery.mutateAsync({
+                    query,
+                  });
 
-                try{
-                    const data =
-                    await extractMinimumGraphQLSchemaFromQuery.mutateAsync({
-                      query,
-                    });
-    
-                  setFormData(
-                    produce((draft) => {
-                      draft.graphQLSchema = data;
-                    }, formData)
-                  );
-                }
-                catch{
-                    setFormData(
-                        produce((draft) => {
-                          draft.graphQLSchema = "";
-                        }, formData)
-                      );
-                }
-
+                setFormData(
+                  produce((draft) => {
+                    draft.graphQLSchema = data;
+                  }, formData)
+                );
+              } catch {
+                setFormData(
+                  produce((draft) => {
+                    draft.graphQLSchema = "";
+                  }, formData)
+                );
+              }
             }}
-            title=""
-
           />
         </div>
         <Textarea
