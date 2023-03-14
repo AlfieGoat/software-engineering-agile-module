@@ -77,6 +77,9 @@ export default () => {
             closePopup={() => {
               setShowUpdateSchemaPopup(false);
             }}
+            refetchData={() => {
+              sourceGraphQLSchema.refetch();
+            }}
           />
         )}
       </ContentLayout>
@@ -108,7 +111,13 @@ const CompareLatestSourceGraphQLSchemaWithSubsets = () => {
     </Container>
   );
 };
-function UpdateSchemaPopup({ closePopup }: { closePopup: () => void }) {
+function UpdateSchemaPopup({
+  closePopup,
+  refetchData,
+}: {
+  closePopup: () => void;
+  refetchData: () => void;
+}) {
   const [newSchema, setNewSchema] = useState("");
   const updateSchemaMutation = api.sourceGraphQLSchema.create.useMutation();
 
@@ -123,9 +132,10 @@ function UpdateSchemaPopup({ closePopup }: { closePopup: () => void }) {
               <div className="flex space-x-4">
                 <Button
                   variant="primary"
-                  onClick={() => {
-                    updateSchemaMutation.mutate({ graphQLSchema: newSchema });
+                  onClick={async () => {
+                    await updateSchemaMutation.mutateAsync({ graphQLSchema: newSchema });
                     closePopup();
+                    refetchData();
                   }}
                 >
                   Update schema
