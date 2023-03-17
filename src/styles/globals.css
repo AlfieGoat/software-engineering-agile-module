@@ -23,3 +23,22 @@
 .graphiql-operation-title-bar {
   display: none;
 }
+
+.docExplorerWrap {
+  overflow: unset !important;
+}
+
+[class^="graphiql-explorer-"] > span {
+  display: flex;
+  align-items: center;
+}
+
+.graphiql-explorer-graphql-arguments > div  {
+  display: flex;
+  align-items: center; 
+}
+
+.graphiql-explorer-graphql-arguments > div > div >div {
+  display: flex;
+  align-items: center; 
+}
