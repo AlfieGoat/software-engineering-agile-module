@@ -99,8 +99,7 @@ const CompareLatestSourceGraphQLSchemaWithSubsets = () => {
       {!!compareLatestSourceGraphQLSchemaWithSubsets.data ? (
         <div className="whitespace-pre">
           {
-            // split by "added" to remove unnecessary diffs
-            compareLatestSourceGraphQLSchemaWithSubsets.data.diffNoColor
+            compareLatestSourceGraphQLSchemaWithSubsets.data.breakingChanges.map(change => `+++${change.description.split(" ")[0]} \n`)
           }
         </div>
       ) : (

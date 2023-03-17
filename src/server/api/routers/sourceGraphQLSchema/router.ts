@@ -65,8 +65,8 @@ export const sourceGraphQLSchemaRouter = createTRPCRouter({
       );
 
       const schemaDiff = await getDiff(
+        sourceGraphQLSchema.graphQLSchema,
         allGraphQLSubsetsMergedSdl,
-        sourceGraphQLSchema.graphQLSchema
       );
 
       return schemaDiff;

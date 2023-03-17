@@ -523,9 +523,10 @@ const getFieldAllowListInfo = (
 
     if (
       pathType?.kind !== "ObjectTypeDefinition" &&
-      pathType?.kind !== "InterfaceTypeDefinition"
+      pathType?.kind !== "InterfaceTypeDefinition" &&
+      pathType?.kind !== "UnionTypeDefinition"
     )
-      throw new Error(`${pathType} is not of type ObjectTypeDefinition!`);
+      throw new Error(`${pathType?.kind} is not of type ObjectTypeDefinition!`);
 
     let nextPathType: TypeNode | undefined;
 
@@ -651,6 +652,29 @@ function pruneSchema(
           );
         });
       }
+    });
+
+    const typesUsedInSchema = new Set<string>();
+
+    const visitor: ASTVisitor = {
+      NamedType: {
+        enter(fieldNode, key, parent, path, ancestors) {
+          typesUsedInSchema.add(fieldNode.name.value);
+        },
+      },
+    };
+    visit(draft, visitor);
+    draft.definitions = draft.definitions.filter((definition) => {
+      if (definition.kind === "UnionTypeDefinition")
+        return typesUsedInSchema.has(definition.name.value);
+
+      if (definition.kind === "EnumTypeDefinition")
+        return typesUsedInSchema.has(definition.name.value);
+
+      if (definition.kind === "ScalarTypeDefinition")
+        return typesUsedInSchema.has(definition.name.value);
+
+      return true
     });
   });
 

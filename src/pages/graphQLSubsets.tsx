@@ -230,7 +230,7 @@ const Home: NextPage = () => {
           navigationHide={true}
         />
         {popupState.state === "Create" && (
-          <div className="absolute top-1/2 left-1/2 z-10 w-1/2 -translate-x-1/2 -translate-y-1/2 transform">
+          <div className="absolute top-0 left-1/2 z-10 w-1/2 -translate-x-1/2 translate-y-16 transform">
             <GraphQLSubsetPopup
               type="Create"
               closePopup={() => {
@@ -246,7 +246,7 @@ const Home: NextPage = () => {
           </div>
         )}
         {popupState.state === "Edit" && selectedGraphQLSubset[0] && (
-          <div className="absolute top-1/2 left-1/2 z-10 w-1/2 -translate-x-1/2 -translate-y-1/2 transform">
+          <div className="absolute top-0 left-1/2 z-10 w-1/2 -translate-x-1/2 translate-y-16 transform">
             <GraphQLSubsetPopup
               type="Edit"
               closePopup={() => {
