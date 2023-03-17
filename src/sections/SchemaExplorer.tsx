@@ -1,5 +1,6 @@
 import GraphiQLExplorer from "graphiql-explorer";
-import { buildSchema } from "graphql";
+import { composeAndValidate, buildFederatedSchema, buildSubgraphSchema } from "@apollo/federation";
+import { buildSchema, parse } from "graphql";
 import { useState } from "react";
 import { api } from "~/utils/api";
 
@@ -18,14 +19,19 @@ export const SchemaExplorer = (props: {
     (sourceGraphQLSchema.isLoading || !sourceGraphQLSchema.data)
   )
     return <></>;
+
+    console.log(buildSchema(
+      props.schema ? props.schema : sourceGraphQLSchema.data!.graphQLSchema)
+    )
   return (
     <GraphiQLExplorer
       query={query}
       showAttribution={false}
       explorerIsOpen={true}
-      schema={buildSchema(
-        props.schema ? props.schema : sourceGraphQLSchema.data!.graphQLSchema
-      )}
+      schema={
+        buildSchema(
+        props.schema ? props.schema : sourceGraphQLSchema.data!.graphQLSchema)
+    }
       onEdit={(query) => {
         setQuery(query);
         if (props.onEdit) props.onEdit(query);

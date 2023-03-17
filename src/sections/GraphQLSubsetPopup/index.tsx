@@ -43,7 +43,7 @@ const GraphQLSubsetPopup = (
 
   const [formData, setFormData] = useAtom(formDataAtom);
   const extractMinimumGraphQLSchemaFromQuery =
-    api.sourceGraphQLSchema.extractMinimumGraphQLSchemaFromQuery.useMutation(
+    api.graphQLSubset.extractMinimumGraphQLSchemaFromQuery.useMutation(
       {}
     );
 

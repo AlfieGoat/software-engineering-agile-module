@@ -1,9 +1,8 @@
 import {
-  mergeTypeDefs,
-  printWithComments,
+  printWithComments
 } from "@graphql-toolkit/schema-merging";
 import { TRPCError } from "@trpc/server";
-import { DocumentNode, print, SelectionNode, TypeNode } from "graphql";
+import { DocumentNode, parse, print, SelectionNode, SelectionSetNode, TypeNode, ValueNode } from "graphql";
 import { getDiff } from "graphql-schema-diff";
 import produce from "immer";
 import { z } from "zod";
@@ -22,7 +21,11 @@ export const sourceGraphQLSchemaRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { graphQLSchema } = input;
 
-      validateAndParseGraphQLSchema(graphQLSchema);
+      // console.log(composeAndValidate([{name: "Subgraph", typeDefs: parse(graphQLSchema) }]))
+
+      console.log(parse(graphQLSchema))
+
+      // validateAndParseGraphQLSchema(graphQLSchema);
 
       const sourceGraphQLSchema = await ctx.prisma.sourceGraphQLSchema.create({
         data: {
@@ -63,7 +66,7 @@ export const sourceGraphQLSchemaRouter = createTRPCRouter({
 
       const schemaDiff = await getDiff(
         allGraphQLSubsetsMergedSdl,
-        printWithComments(mergeTypeDefs([sourceGraphQLSchema.graphQLSchema]))
+        sourceGraphQLSchema.graphQLSchema
       );
 
       return schemaDiff;
@@ -90,15 +93,11 @@ export const sourceGraphQLSchemaRouter = createTRPCRouter({
         sourceGraphQLSchema.graphQLSchema
       );
 
-      const parsedQuery = validateAndParseGraphQLSchema(query);
-      // console.log(JSON.stringify(parsedQuery));
-      // console.log(validate(buil))
+      console.log(query)
 
-      // console.log(JSON.stringify(parsedQuery), "\n\n\n");
+      const parsedQuery = parse(query);
 
-      // console.log(JSON.stringify(parsedSourceGraphQLSchema));
-
-      // const usedArguments: Set<string> = new Set();
+      console.log(JSON.stringify(parsedQuery))
 
       function getFieldPaths(
         nodes: readonly SelectionNode[],
@@ -126,17 +125,6 @@ export const sourceGraphQLSchemaRouter = createTRPCRouter({
           }
         });
 
-        // if (kind === 'Field') {
-        //   const fieldName = name.value;
-        //   const fieldPath = path ? `${path}.${fieldName}` : fieldName;
-        //   paths.push(fieldPath);
-        //   getFieldPaths(node.selectionSet, fieldPath, paths);
-        // } else if (kind === 'SelectionSet') {
-        //   for (const selection of selections) {
-        //     getFieldPaths(selection, path, paths);
-        //   }
-        // }
-
         return paths;
       }
 
@@ -158,34 +146,6 @@ export const sourceGraphQLSchemaRouter = createTRPCRouter({
         definition.selectionSet.selections
       );
 
-      // parsedQuery.definitions.forEach((definition) => {
-      //   if (definition.kind === "OperationDefinition") {
-      //     definition.selectionSet.selections.forEach((selection) => {
-      //       if (selection.kind === "Field") {
-      //         usedFields.add(selection.name.value);
-      //         if (selection.selectionSet) {
-      //           selection.selectionSet.selections.forEach((nestedSelection) => {
-      //             if (nestedSelection.kind === "Field") {
-      //               usedFields.add(
-      //                 `${selection.name.value}.${nestedSelection.name.value}`
-      //               );
-      //             }
-      //           });
-      //         }
-      //         if (selection.arguments && selection.arguments.length > 0) {
-      //           selection.arguments.forEach((arg) => {
-      //             usedArguments.add(
-      //               `${selection.name.value}.${arg.name.value}`
-      //             );
-      //           });
-      //         }
-      //       }
-      //     });
-      //   }
-      // });
-
-      // console.log(usedFields);
-
       const allowList: { [key: string]: { [key: string]: string } } = {};
 
       usedFields.forEach((field) => {
@@ -199,8 +159,6 @@ export const sourceGraphQLSchemaRouter = createTRPCRouter({
         };
       });
 
-      // console.log(allowList, "\n-------");
-
       const prunedSchema = produce((draft) => {
         let definitionAllowLists: string[] = [];
         draft.definitions.forEach((definition) => {
@@ -209,6 +167,16 @@ export const sourceGraphQLSchemaRouter = createTRPCRouter({
               if (Object.keys(allowList).includes(definition.name.value))
                 definitionAllowLists.push(definition.name.value);
               break;
+            case "InputObjectTypeDefinition":
+              console.log(definition.name.value)
+            case "EnumTypeDefinition":
+              console.log("EnumTypeDefinition", definition.name.value)
+            case "UnionTypeDefinition":
+              console.log("UnionTypeDefinition", definition.name.value)
+            case "InterfaceTypeDefinition":
+              console.log("InterfaceTypeDefinition", definition.name.value)
+            case "ScalarTypeDefinition":
+              console.log("ScalarTypeDefinition", definition.name.value)
             case "SchemaDefinition":
               break;
             default:
@@ -219,18 +187,39 @@ export const sourceGraphQLSchemaRouter = createTRPCRouter({
               );
           }
         });
+
+        // Definition filtering
         draft.definitions = draft.definitions.filter((definition) => {
-          if (
-            definition.kind !== "ObjectTypeDefinition" &&
-            definition.kind !== "SchemaDefinition"
-          )
-            throw new TRPCError({ code: "BAD_REQUEST" });
-          return (
-            definition.kind === "SchemaDefinition" ||
-            definitionAllowLists.includes(definition.name.value)
-          );
+          switch (definition.kind) {
+            case "ObjectTypeDefinition":
+              return definitionAllowLists.includes(definition.name.value)
+            case "InputObjectTypeDefinition":
+              console.log(definition.name.value)
+              return true;
+            case "EnumTypeDefinition":
+              console.log("EnumTypeDefinition", definition.name.value)
+              return true;
+            case "UnionTypeDefinition":
+              console.log("UnionTypeDefinition", definition.name.value)
+              return true;
+            case "InterfaceTypeDefinition":
+              console.log("InterfaceTypeDefinition", definition.name.value)
+              return true;
+            case "ScalarTypeDefinition":
+              console.log("ScalarTypeDefinition", definition.name.value)
+              return true;
+            case "SchemaDefinition":
+              return true;
+            default:
+              throw new Error(
+                `Encountered unexpected definition kind: ${
+                  definition.kind
+                }\nDefinition: ${JSON.stringify(definition)}`
+              );
+          }
         });
 
+        // field filtering
         draft.definitions.forEach((definition, definitionIndex) => {
           switch (definition.kind) {
             case "ObjectTypeDefinition":
@@ -240,26 +229,56 @@ export const sourceGraphQLSchemaRouter = createTRPCRouter({
                 )
               );
 
-            case "SchemaDefinition":
-              break;
-            default:
-              throw new Error(
-                `Encountered unexpected definition kind: ${
-                  definition.kind
-                }\nDefinition: ${JSON.stringify(definition)}`
-              );
           }
         });
       }, parsedSourceGraphQLSchema);
 
-      // console.log(print(prunedSchema(parsedSourceGraphQLSchema)));
 
-      validateAndParseGraphQLSchema(
-        print(prunedSchema(parsedSourceGraphQLSchema))
-      );
+      // validateAndParseGraphQLSchema(
+      //   print(prunedSchema(parsedSourceGraphQLSchema))
+      // );
 
       return print(prunedSchema(parsedSourceGraphQLSchema));
     }),
+
+    extractMinimumGraphQLSchemaFromQuery2: protectedAdminProcedure
+  .input(z.object({ query: z.string() }))
+  .mutation(async ({ ctx, input }) => {
+    const { query } = input;
+
+    const sourceGraphQLSchema =
+      await ctx.prisma.sourceGraphQLSchema.findFirst({
+        orderBy: { createdAt: "desc" },
+      });
+
+    if (!sourceGraphQLSchema)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Failed to find the latest Source GraphQL Schema.",
+      });
+
+    const parsedSourceGraphQLSchema = validateAndParseGraphQLSchema(
+      sourceGraphQLSchema.graphQLSchema
+    );
+
+    const parsedQuery = parse(query);
+
+    // 1. Collect all field paths and input object types
+    const { usedFields, usedInputTypes } = collectUsedFieldsAndInputTypes(parsedQuery);
+
+    console.log(usedFields, usedInputTypes);
+
+    // 2. Create the allowList
+    const allowList = createAllowList(usedFields, parsedSourceGraphQLSchema);
+
+    // 3. Add used input object types, enum types, union types, interface types, and scalar types to the allowList
+    addUsedInputTypesToAllowList(usedInputTypes, allowList, parsedSourceGraphQLSchema);
+
+    // 4. Prune the schema
+    const prunedSchema = pruneSchema(parsedSourceGraphQLSchema, allowList);
+
+    return print(prunedSchema);
+  }),
 });
 
 const getTypeNameByFieldPath = (
@@ -336,3 +355,193 @@ const resolveRootType = (type: TypeNode): string => {
       throw new Error(`Failed to resolve type: , ${JSON.stringify(type)}`);
   }
 };
+
+
+async function traverseInputQuery(
+  nodes: readonly SelectionNode[],
+  parentType: string,
+  schema: DocumentNode,
+  operationType: 'Query' | 'Mutation'
+): Promise<string[]> {
+  const usedTypes: string[] = [];
+
+  for (const node of nodes) {
+    if (node.kind === 'Field') {
+      const typeInfo = getTypeNameByFieldPath(`${parentType}.${node.name.value}`, schema);
+      usedTypes.push(`${typeInfo.fieldParentType}.${typeInfo.fieldName}`);
+
+      if (node.arguments) {
+        for (const arg of node.arguments) {
+          const argType = getArgumentType(arg, schema);
+          if (argType) {
+            usedTypes.push(argType);
+          }
+        }
+      }
+
+      if (node.selectionSet) {
+        const fieldUsedTypes = await traverseInputQuery(
+          node.selectionSet.selections,
+          typeInfo.fieldType,
+          schema,
+          operationType
+        );
+        usedTypes.push(...fieldUsedTypes);
+      }
+    } else if (node.kind === 'FragmentSpread') {
+      const fragmentName = node.name.value;
+      const fragmentDefinition = getFragmentDefinition(fragmentName, schema);
+      if (fragmentDefinition) {
+        const fragmentUsedTypes = await traverseInputQuery(
+          fragmentDefinition.selectionSet.selections,
+          fragmentDefinition.typeCondition.name.value,
+          schema,
+          operationType
+        );
+        usedTypes.push(...fragmentUsedTypes);
+      }
+    } else if (node.kind === 'InlineFragment') {
+      const inlineFragmentType = node.typeCondition?.name.value || parentType;
+      if (node.selectionSet) {
+        const inlineFragmentUsedTypes = await traverseInputQuery(
+          node.selectionSet.selections,
+          inlineFragmentType,
+          schema,
+          operationType
+        );
+        usedTypes.push(...inlineFragmentUsedTypes);
+      }
+    }
+  }
+
+  return usedTypes;
+}
+
+function collectUsedFieldsAndInputTypes(
+  parsedQuery: DocumentNode
+): { usedFields: string[]; usedInputTypes: Set<string> } {
+  const usedFields: string[] = [];
+  const usedInputTypes = new Set<string>();
+
+  function traverseSelectionSet(
+    selectionSet: SelectionSetNode,
+    path: string = "",
+    inputTypePath: string = ""
+  ) {
+    selectionSet.selections.forEach((selection) => {
+      if (selection.kind === "Field") {
+        const newPath = path === "" ? selection.name.value : `${path}.${selection.name.value}`;
+        usedFields.push(newPath);
+
+        if (selection.arguments) {
+          selection.arguments.forEach((arg) => {
+            if (arg.value.kind === "ObjectValue") {
+              traverseInputValues(arg.value, inputTypePath, usedInputTypes);
+            }
+          });
+        }
+
+        if (selection.selectionSet) {
+          traverseSelectionSet(selection.selectionSet, newPath, inputTypePath);
+        }
+      } else if (selection.kind === "InlineFragment") {
+        if (selection.selectionSet) {
+          traverseSelectionSet(selection.selectionSet, path, inputTypePath);
+        }
+      } else if (selection.kind === "FragmentSpread") {
+        // Handle fragment spreads
+      }
+    });
+  }
+
+  traverseSelectionSet(parsedQuery.definitions[0].selectionSet);
+  return { usedFields, usedInputTypes };
+}
+
+function traverseInputValues(
+  valueNode: ValueNode,
+  inputTypePath: string,
+  usedInputTypes: Set<string>
+) {
+  if (valueNode.kind === "ObjectValue") {
+    valueNode.fields.forEach((field) => {
+      const fieldInputTypePath = inputTypePath === "" ? field.name.value : `${inputTypePath}.${field.name.value}`;
+      usedInputTypes.add(fieldInputTypePath);
+
+      if (field.value.kind === "ObjectValue" || field.value.kind === "ListValue") {
+        traverseInputValues(field.value, fieldInputTypePath, usedInputTypes);
+      }
+    });
+  } else if (valueNode.kind === "ListValue") {
+    valueNode.values.forEach((listValue) => {
+      if (listValue.kind === "ObjectValue" || listValue.kind === "ListValue") {
+        traverseInputValues(listValue, inputTypePath, usedInputTypes);
+      }
+    });
+  }
+}
+
+
+// async function extractMinimumGraphQLSchemaFromQuery({ ctx, input }): Promise<string> {
+//   const { query } = input;
+
+//   const sourceGraphQLSchema = await ctx.prisma.sourceGraphQLSchema.findFirst({
+//     orderBy: { createdAt: 'desc' },
+//   });
+
+//   if (!sourceGraphQLSchema)
+//     throw new TRPCError({
+//       code: 'NOT_FOUND',
+//       message: 'Failed to find the latest Source GraphQL Schema.',
+//     });
+
+//   const parsedSourceGraphQLSchema = validateAndParseGraphQLSchema(sourceGraphQLSchema.graphQLSchema);
+//   const parsedQuery = parse(query);
+
+//   const operationDefinition = parsedQuery.definitions.find((definition) => definition.kind === 'OperationDefinition');
+//   if (!operationDefinition)
+//     throw new TRPCError({
+//       code: 'BAD_REQUEST',
+//       message: 'Parsed query had incorrect definition type',
+//     });
+
+//   const usedTypes = await traverseInputQuery(
+//     operationDefinition.selectionSet.selections,
+//     operationDefinition.operation === 'query' ? 'Query' : 'Mutation',
+//     parsedSourceGraphQLSchema,
+//     operationDefinition.operation
+//   );
+
+//   const allowList: { [key: string]: { [key: string]: string } } = {};
+
+//   usedTypes.forEach((typePath) => {
+//     const typeInfo = getTypeNameByFieldPath(typePath, parsedSourceGraphQLSchema);
+//     if (!allowList[typeInfo.fieldParentType]) {
+//       allowList[typeInfo.fieldParentType] = {};
+//     }
+//     allowList[typeInfo.fieldParentType][typeInfo.fieldName] = typeInfo.fieldType;
+//   });
+
+//   const prunedSchema = produce((draft) => {
+//     draft.definitions = draft.definitions.filter((definition) => {
+//       if (definition.kind === 'ObjectTypeDefinition') {
+//         return Object.keys(allowList).includes(definition.name.value
+//           );
+// } else if (definition.kind === 'InputObjectTypeDefinition') {
+// return isInputTypeUsed(definition.name.value, allowList);
+// } else if (definition.kind === 'EnumTypeDefinition') {
+// return isEnumTypeUsed(definition.name.value, allowList);
+// } else if (definition.kind === 'UnionTypeDefinition') {
+// return isUnionTypeUsed(definition.name.value, allowList);
+// } else if (definition.kind === 'InterfaceTypeDefinition') {
+// return isInterfaceTypeUsed(definition.name.value, allowList);
+// } else if (definition.kind === 'ScalarTypeDefinition') {
+// return isScalarTypeUsed(definition.name.value, allowList);
+// } else if (definition.kind === 'SchemaDefinition') {
+// return true;
+// } else {
+// throw new Error(
+// `Encountered unexpected definition kind: ${definition.kind}\nDefinition: ${JSON.stringify(definition)}`
+// );
+// }
+// });
