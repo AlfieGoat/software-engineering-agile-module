@@ -2,11 +2,15 @@ import {
   mergeTypeDefs,
   printWithComments,
 } from "@graphql-toolkit/schema-merging";
-import { GraphQLSubset, Prisma, PrismaClient } from "@prisma/client";
+import {
+  type GraphQLSubset,
+  type Prisma,
+  type PrismaClient,
+} from "@prisma/client";
 import { TRPCError } from "@trpc/server";
-import { DocumentNode } from "graphql";
-import { z } from "zod";
-import { UpdateProductInputSchema } from "./router";
+import { type DocumentNode } from "graphql";
+import { type z } from "zod";
+import { type UpdateProductInputSchema } from "./router";
 
 export const mergeSchemas = (graphQLSubsets: GraphQLSubset[]): DocumentNode => {
   try {
@@ -44,7 +48,7 @@ export const updateProduct = async (
   });
 
   const mergedSchemas = mergeSchemas(graphQLSubsets);
-  const mergedSchemasSdl = printWithComments(mergedSchemas);
+  const mergedSchemasSdl = printWithComments(mergedSchemas) as string;
 
   return tx.product.update({
     where: { id: productUpdateData.productId },

@@ -9,7 +9,7 @@ import Pagination from "@cloudscape-design/components/pagination";
 import TextFilter from "@cloudscape-design/components/text-filter";
 
 import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
-import { Product, type GraphQLSubset } from "@prisma/client";
+import { type GraphQLSubset, type Product } from "@prisma/client";
 import CustomerProduct from "~/sections/Customer/CustomersProduct";
 import CustomHead from "~/sections/CustomHead";
 import GraphQLSubsetPopup from "~/sections/GraphQLSubsetPopup";
@@ -94,7 +94,7 @@ const Home: NextPage = () => {
                     header: "Products using this subset",
                     content: (e) =>
                       e.products.map((product) => (
-                        <li className="list-inside list-disc">
+                        <li className="list-inside list-disc" key={product.id}>
                           <CustomerProduct
                             productId={product.id}
                             productName={product.name}

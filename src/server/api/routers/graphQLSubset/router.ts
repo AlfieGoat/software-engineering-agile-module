@@ -7,7 +7,7 @@ import { validateAndParseGraphQLSchema } from "./graphQL";
 
 import { parse, print } from "graphql";
 import { collectLeafPaths } from "./collectLeafPaths/collectLeafPaths";
-import { ValidPathNode } from "./collectLeafPaths/getPathsToLeaves";
+import { type ValidPathNode } from "./collectLeafPaths/getPathsToLeaves";
 import { produceAllowList } from "./produceAllowList/produceAllowList";
 import { pruneSchema } from "./pruneSchema/pruneSchema";
 

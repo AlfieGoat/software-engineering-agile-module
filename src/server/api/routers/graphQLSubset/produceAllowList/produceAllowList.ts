@@ -1,16 +1,16 @@
-import { DocumentNode } from "graphql";
+import { type DocumentNode } from "graphql";
 import {
-  ArgumentPathNodes,
-  ValidPathNode,
+  type ArgumentPathNodes,
+  type ValidPathNode,
 } from "../collectLeafPaths/getPathsToLeaves";
 import { getArgumentAllowListInfo } from "./getArgumentAllowListInfo";
 import { getFieldAllowListInfo } from "./getFieldAllowListInfo";
-import { Argument, Field } from "./types";
+import { type Argument, type Field } from "./types";
 
 export function produceAllowList(
   schema: DocumentNode,
   usedFields: ValidPathNode[][]
-) {
+): [Record<string, Field[]>, Record<string, Argument[]>] {
   const fieldAllowList: Record<string, Field[]> = {};
 
   const argumentAllowList: Record<string, Argument[]> = {};

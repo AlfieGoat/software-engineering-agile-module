@@ -1,8 +1,8 @@
-import { DocumentNode, TypeNode } from "graphql";
-import { FieldPathsNodes } from "../collectLeafPaths/getPathsToLeaves";
+import { type DocumentNode, type TypeNode } from "graphql";
+import { type FieldPathsNodes } from "../collectLeafPaths/getPathsToLeaves";
 import { getQueryOperation } from "./getQueryOperation";
 import { resolveRootType } from "./resolveRootType";
-import { Field } from "./types";
+import { type Field } from "./types";
 
 export const getFieldAllowListInfo = (
   field: FieldPathsNodes[],
@@ -12,7 +12,10 @@ export const getFieldAllowListInfo = (
     (definition) =>
       definition.kind === "ObjectTypeDefinition" &&
       definition.name.value === "Query"
-  )!;
+  );
+
+  if (!queryObjectTypeDefinition)
+    throw new Error("Failed to find queryObjectTypeDefinition");
 
   if (queryObjectTypeDefinition.kind !== "ObjectTypeDefinition")
     throw new Error("Query Type Definition is not the correct kind");
@@ -35,12 +38,15 @@ export const getFieldAllowListInfo = (
       return definition.name.value === state.fieldType;
     });
 
+    if (!pathType)
+      throw new Error(`Couldn't find pathType for field ${state.fieldType}`);
+
     if (
-      pathType?.kind !== "ObjectTypeDefinition" &&
-      pathType?.kind !== "InterfaceTypeDefinition" &&
-      pathType?.kind !== "UnionTypeDefinition"
+      pathType.kind !== "ObjectTypeDefinition" &&
+      pathType.kind !== "InterfaceTypeDefinition" &&
+      pathType.kind !== "UnionTypeDefinition"
     )
-      throw new Error(`${pathType?.kind} is not of type ObjectTypeDefinition!`);
+      throw new Error(`${pathType.kind} is not of type ObjectTypeDefinition!`);
 
     let nextPathType: TypeNode | undefined;
 
@@ -49,7 +55,7 @@ export const getFieldAllowListInfo = (
         if (pathType.kind === "UnionTypeDefinition")
           throw new Error("pathType is Union!");
         nextPathType = pathType.fields?.find((field) => {
-          return field.name.value! === currentField.name.value;
+          return field.name.value === currentField.name.value;
         })?.type;
         break;
       case "InlineFragment":

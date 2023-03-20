@@ -39,7 +39,7 @@ export const productRouter = createTRPCRouter({
       });
 
       const mergedSchemas = mergeSchemas(graphQLSubsets);
-      const mergedSchemasSdl = printWithComments(mergedSchemas);
+      const mergedSchemasSdl = printWithComments(mergedSchemas) as string;
 
       const product = await ctx.prisma.product.create({
         data: {
