@@ -39,8 +39,10 @@ interface NonePopupState {
 type Popup = CreatePopupState | EditPopupState | NonePopupState;
 
 const Home: NextPage = () => {
+  const [filterText, setFilterText] = useState<string | null>(null);
+
   const products = api.product.getAll.useInfiniteQuery(
-    { limit: PAGE_SIZE },
+    { limit: PAGE_SIZE, filterText },
     { getNextPageParam: (lastPage) => lastPage.nextCursor }
   );
 
@@ -68,8 +70,6 @@ const Home: NextPage = () => {
   if (!showChild) {
     return null;
   }
-
-  if (!products.data) return null;
 
   return (
     <>
@@ -130,7 +130,7 @@ const Home: NextPage = () => {
                 ],
               }}
               cardsPerRow={[{ cards: 1 }, { minWidth: 500, cards: 2 }]}
-              items={products.data.pages[paginationIndex]?.items ?? []}
+              items={products.data?.pages[paginationIndex]?.items ?? []}
               loadingText="Loading Products..."
               selectionType="multi"
               trackBy="id"
@@ -159,8 +159,12 @@ const Home: NextPage = () => {
               }
               filter={
                 <TextFilter
-                  filteringPlaceholder="Find resources"
-                  filteringText=""
+                  filteringPlaceholder="Find product"
+                  filteringText={filterText || ""}
+                  onChange={(data) => {
+                    setPaginationIndex(0);
+                    setFilterText(data.detail.filteringText);
+                  }}
                 />
               }
               header={
@@ -168,14 +172,14 @@ const Home: NextPage = () => {
                   counter={
                     selectedProducts.length
                       ? `(${selectedProducts.length}/${
-                          products.data.pages.flatMap(
+                          products.data?.pages.flatMap(
                             (product) => product.items
-                          ).length
+                          ).length || 0
                         })`
                       : `(${
-                          products.data.pages.flatMap(
+                          products.data?.pages.flatMap(
                             (product) => product.items
-                          ).length
+                          ).length || 0
                         })`
                   }
                   actions={
@@ -229,8 +233,8 @@ const Home: NextPage = () => {
                   currentPageIndex={paginationIndex + 1}
                   pagesCount={
                     products.hasNextPage
-                      ? products.data.pages.length + 1
-                      : products.data.pages.length
+                      ? products.data?.pages.length + 1
+                      : products.data?.pages.length
                   }
                   onNextPageClick={async () => {
                     await products.fetchNextPage();

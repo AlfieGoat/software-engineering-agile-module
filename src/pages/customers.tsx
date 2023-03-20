@@ -34,8 +34,10 @@ interface NonePopupState {
 type Popup = CreatePopupState | EditPopupState | NonePopupState;
 
 const Home: NextPage = () => {
+  const [filterText, setFilterText] = useState<string | null>(null);
+
   const customers = api.customer.getAll.useInfiniteQuery(
-    { limit: PAGE_SIZE },
+    { limit: PAGE_SIZE, filterText },
     { getNextPageParam: (lastPage) => lastPage.nextCursor }
   );
 
@@ -60,8 +62,6 @@ const Home: NextPage = () => {
   if (!showChild) {
     return null;
   }
-
-  if (!customers.data) return null;
 
   return (
     <>
@@ -111,7 +111,7 @@ const Home: NextPage = () => {
                 ],
               }}
               cardsPerRow={[{ cards: 1 }, { minWidth: 500, cards: 2 }]}
-              items={customers.data.pages[paginationIndex]?.items ?? []}
+              items={customers.data?.pages[paginationIndex]?.items ?? []}
               loadingText="Loading Customers..."
               selectionType="multi"
               trackBy="id"
@@ -138,8 +138,12 @@ const Home: NextPage = () => {
               }
               filter={
                 <TextFilter
-                  filteringPlaceholder="Find resources"
-                  filteringText=""
+                  filteringPlaceholder="Find customer"
+                  filteringText={filterText || ""}
+                  onChange={(data) => {
+                    setPaginationIndex(0);
+                    setFilterText(data.detail.filteringText);
+                  }}
                 />
               }
               header={
@@ -147,14 +151,14 @@ const Home: NextPage = () => {
                   counter={
                     selectedCustomers.length
                       ? `(${selectedCustomers.length}/${
-                          customers.data.pages.flatMap(
+                          customers.data?.pages.flatMap(
                             (customer) => customer.items
-                          ).length
+                          ).length || 0
                         })`
                       : `(${
-                          customers.data.pages.flatMap(
+                          customers.data?.pages.flatMap(
                             (customer) => customer.items
-                          ).length
+                          ).length || 0
                         })`
                   }
                   actions={
@@ -207,9 +211,9 @@ const Home: NextPage = () => {
                 <Pagination
                   currentPageIndex={paginationIndex + 1}
                   pagesCount={
-                    customers.hasNextPage
+                    customers.hasNextPage && customers.data
                       ? customers.data.pages.length + 1
-                      : customers.data.pages.length
+                      : customers.data?.pages.length || 0
                   }
                   onNextPageClick={async () => {
                     await customers.fetchNextPage();

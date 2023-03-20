@@ -141,7 +141,7 @@ const Home: NextPage = () => {
               }
               filter={
                 <TextFilter
-                  filteringPlaceholder="Find resources"
+                  filteringPlaceholder="Find subset"
                   filteringText={filterText || ""}
                   onChange={(data) => {
                     setPaginationIndex(0);

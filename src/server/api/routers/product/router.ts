@@ -58,7 +58,7 @@ export const productRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const product = await ctx.prisma.product.findUnique({
         where: { id: input.productId },
-        include: { subsets: true,customers: true },
+        include: { subsets: true, customers: true },
       });
 
       return product;
@@ -67,13 +67,14 @@ export const productRouter = createTRPCRouter({
   getAll: protectedProcedure
     .input(
       z.object({
+        filterText: z.string().nullish(),
         limit: z.number().min(1).max(MAX_PAGE_SIZE).nullish(),
         cursor: z.string().nullish(), // <-- "cursor" needs to exist, but can be any type
       })
     )
     .query(async ({ ctx, input }) => {
       const limit = input.limit ?? DEFAULT_PAGE_SIZE;
-      const { cursor } = input;
+      const { cursor, filterText } = input;
       const items = await ctx.prisma.product.findMany({
         take: limit + 1, // get an extra item at the end which we'll use as next cursor
         cursor: cursor ? { id: cursor } : undefined,
@@ -81,6 +82,18 @@ export const productRouter = createTRPCRouter({
           createdAt: "asc",
         },
         include: { subsets: true, customers: true },
+        ...(filterText
+          ? {
+              where: {
+                OR: [
+                  { name: { contains: filterText, mode: "insensitive" } },
+                  {
+                    description: { contains: filterText, mode: "insensitive" },
+                  },
+                ],
+              },
+            }
+          : {}),
       });
       let nextCursor: typeof cursor | undefined = undefined;
       if (items.length > limit) {
