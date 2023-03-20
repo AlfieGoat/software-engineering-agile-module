@@ -65,7 +65,7 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <CustomHead />
+      <CustomHead pageName="Customers" />
       <main className="flex min-h-screen flex-col ">
         <AppLayout
           content={

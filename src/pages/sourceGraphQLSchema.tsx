@@ -26,7 +26,7 @@ const SourceGraphQLSchema = () => {
 
   return (
     <>
-      <CustomHead />
+      <CustomHead pageName="Source Schema" />
       <ContentLayout
         header={
           <div className="p-4">
