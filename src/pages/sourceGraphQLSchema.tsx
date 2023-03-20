@@ -53,6 +53,7 @@ const SourceGraphQLSchema = () => {
         }
       >
         <div className="space-y-8 px-8 pb-8">
+          <CompareLatestSourceGraphQLSchemaWithSubsets />
           <Container header={<Header variant="h2">Schema</Header>}>
             {sourceGraphQLSchema.isLoading && (
               <p className="font-bold">Loading...</p>
@@ -67,9 +68,6 @@ const SourceGraphQLSchema = () => {
               </p>
             )}
           </Container>
-          {sourceGraphQLSchema.data && (
-            <CompareLatestSourceGraphQLSchemaWithSubsets />
-          )}
         </div>
         {showUpdateSchemaPopup && (
           <UpdateSchemaPopup
