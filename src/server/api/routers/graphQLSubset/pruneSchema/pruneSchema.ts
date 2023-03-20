@@ -1,6 +1,6 @@
-import { ASTVisitor, DocumentNode, visit } from "graphql";
+import { visit, type ASTVisitor, type DocumentNode } from "graphql";
 import produce from "immer";
-import { Argument, Field } from "../produceAllowList/types";
+import { type Argument, type Field } from "../produceAllowList/types";
 
 export function pruneSchema(
   parsedSourceGraphQLSchema: DocumentNode,

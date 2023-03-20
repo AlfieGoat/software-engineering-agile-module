@@ -6,7 +6,7 @@ import {
   Input,
   Textarea,
 } from "@cloudscape-design/components";
-import { GraphQLSubset } from "@prisma/client";
+import { type GraphQLSubset } from "@prisma/client";
 import produce from "immer";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
@@ -43,9 +43,7 @@ const GraphQLSubsetPopup = (
 
   const [formData, setFormData] = useAtom(formDataAtom);
   const extractMinimumGraphQLSchemaFromQuery =
-    api.graphQLSubset.extractMinimumGraphQLSchemaFromQuery.useMutation(
-      {}
-    );
+    api.graphQLSubset.extractMinimumGraphQLSchemaFromQuery.useMutation({});
 
   const { buttonText, headingText } = Content[props.type];
 

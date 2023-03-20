@@ -1,9 +1,12 @@
-import Header from "@cloudscape-design/components/header";
-import { GraphQLSubset } from "@prisma/client";
+import { type GraphQLSubset } from "@prisma/client";
 import produce from "immer";
 import { useState } from "react";
 
-export default function SubsetDisplay({subsets}: {subsets: GraphQLSubset[]}) {
+export default function SubsetDisplay({
+  subsets,
+}: {
+  subsets: GraphQLSubset[];
+}) {
   const [subsetSchemasToShow, setSubsetSchemasToShow] = useState<string[]>([]);
 
   return (
@@ -11,7 +14,10 @@ export default function SubsetDisplay({subsets}: {subsets: GraphQLSubset[]}) {
       {subsets.map((subset) => {
         const showSubsetSchema = subsetSchemasToShow.includes(subset.id);
         return (
-          <div className="my-2 max-h-96 overflow-y-auto rounded-xl border-2 p-2">
+          <div
+            key={subset.id}
+            className="my-2 max-h-96 overflow-y-auto rounded-xl border-2 p-2"
+          >
             <div className="flex items-center justify-between">
               <span className="font-bold">{subset.name}</span>
               {showSubsetSchema ? (

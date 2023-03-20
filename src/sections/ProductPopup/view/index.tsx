@@ -1,6 +1,10 @@
 import { Icon } from "@cloudscape-design/components";
 import Header from "@cloudscape-design/components/header";
-import { Customer, GraphQLSubset, Product } from "@prisma/client";
+import {
+  type Customer,
+  type GraphQLSubset,
+  type Product,
+} from "@prisma/client";
 import CustomersDisplay from "./CustomersDisplay";
 import SubsetDisplay from "./SubsetDisplay";
 

@@ -1,6 +1,6 @@
-import { api } from "~/utils/api";
-import { FormData } from "./atoms";
-import { CreateNewProductsProps, EditProductsProps } from "./index";
+import { type api } from "~/utils/api";
+import { type FormData } from "./atoms";
+import { type CreateNewProductsProps, type EditProductsProps } from "./index";
 
 export const onSubmit = async (
   formData: FormData,

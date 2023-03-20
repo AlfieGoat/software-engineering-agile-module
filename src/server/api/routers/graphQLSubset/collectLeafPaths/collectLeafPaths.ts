@@ -1,5 +1,5 @@
-import { ASTNode, ASTVisitor, visit } from "graphql";
-import { getPathsToLeaves, ValidPathNode } from "./getPathsToLeaves";
+import { visit, type ASTNode, type ASTVisitor } from "graphql";
+import { getPathsToLeaves, type ValidPathNode } from "./getPathsToLeaves";
 
 export function collectLeafPaths(
   rootNode: ASTNode,
@@ -9,19 +9,19 @@ export function collectLeafPaths(
   const visitor: ASTVisitor = {
     Field: {
       enter(fieldNode, key, parent, path, ancestors) {
-        let fullPath = getPathsToLeaves(ancestors, fieldNode);
+        const fullPath = getPathsToLeaves(ancestors, fieldNode);
         leafPaths.push(fullPath);
       },
     },
     ObjectField: {
       enter(fieldNode, key, parent, path, ancestors) {
-        let fullPath = getPathsToLeaves(ancestors, fieldNode);
+        const fullPath = getPathsToLeaves(ancestors, fieldNode);
         leafPaths.push(fullPath);
       },
     },
     Argument: {
       enter(fieldNode, key, parent, path, ancestors) {
-        let fullPath = getPathsToLeaves(ancestors, fieldNode);
+        const fullPath = getPathsToLeaves(ancestors, fieldNode);
         leafPaths.push(fullPath);
       },
     },

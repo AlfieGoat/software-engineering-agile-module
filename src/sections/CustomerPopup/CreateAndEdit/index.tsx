@@ -6,7 +6,7 @@ import {
   Input,
   Textarea,
 } from "@cloudscape-design/components";
-import { Customer, Product } from "@prisma/client";
+import { type Customer, type Product } from "@prisma/client";
 import produce from "immer";
 import { useAtom } from "jotai";
 import { useEffect } from "react";

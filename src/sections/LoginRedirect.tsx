@@ -5,7 +5,7 @@ interface LoginRedirectProps {
   children: ReactNode;
 }
 
-export default (props: LoginRedirectProps) => {
+const LoginRedirect = (props: LoginRedirectProps) => {
   const { status: sessionStatus } = useSession();
 
   useEffect(() => {
@@ -14,3 +14,5 @@ export default (props: LoginRedirectProps) => {
 
   return <>{props.children}</>;
 };
+
+export default LoginRedirect;

@@ -1,8 +1,10 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { User, UserRole } from "@prisma/client";
+import { type User, type UserRole } from "@prisma/client";
 import { type GetServerSidePropsContext } from "next";
 import {
-  getServerSession, type DefaultSession, type NextAuthOptions
+  getServerSession,
+  type DefaultSession,
+  type NextAuthOptions,
 } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import { env } from "~/env.mjs";
@@ -18,7 +20,7 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      role: UserRole
+      role: UserRole;
       // ...other properties
       // role: UserRole;
     } & DefaultSession["user"];
@@ -41,7 +43,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = user.id;
 
-        session.user.role = (user as User).role
+        session.user.role = (user as User).role;
         // session.user.role = user.role; <-- put other properties on the session here
       }
       return session;

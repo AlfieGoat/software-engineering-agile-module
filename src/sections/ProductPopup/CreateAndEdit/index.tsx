@@ -6,7 +6,7 @@ import {
   Input,
   Textarea,
 } from "@cloudscape-design/components";
-import { GraphQLSubset, Product } from "@prisma/client";
+import { type GraphQLSubset, type Product } from "@prisma/client";
 import produce from "immer";
 import { useAtom } from "jotai";
 import { useEffect } from "react";

@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { buildASTSchema, buildSchema, DocumentNode, parse, validateSchema } from "graphql";
+import { buildASTSchema, parse, type DocumentNode } from "graphql";
 
 export const validateAndParseGraphQLSchema = (graphQLSchema: string) => {
   let parsedGraphQLSchema: DocumentNode;

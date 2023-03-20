@@ -10,7 +10,7 @@ import HomeButton from "~/sections/HomeButton";
 
 import { api } from "~/utils/api";
 
-export default () => {
+const SourceGraphQLSchema = () => {
   const sourceGraphQLSchema = api.sourceGraphQLSchema.getLatest.useQuery();
   const [showUpdateSchemaPopup, setShowUpdateSchemaPopup] = useState(false);
 
@@ -20,7 +20,6 @@ export default () => {
     setShowChild(true);
   }, []);
 
-  useEffect(() => {}, []);
   if (!showChild) {
     return null;
   }
@@ -77,8 +76,8 @@ export default () => {
             closePopup={() => {
               setShowUpdateSchemaPopup(false);
             }}
-            refetchData={() => {
-              sourceGraphQLSchema.refetch();
+            refetchData={async () => {
+              await sourceGraphQLSchema.refetch();
             }}
           />
         )}
@@ -86,6 +85,8 @@ export default () => {
     </>
   );
 };
+
+export default SourceGraphQLSchema;
 
 const CompareLatestSourceGraphQLSchemaWithSubsets = () => {
   const compareLatestSourceGraphQLSchemaWithSubsets =
@@ -98,9 +99,9 @@ const CompareLatestSourceGraphQLSchemaWithSubsets = () => {
       )}
       {!!compareLatestSourceGraphQLSchemaWithSubsets.data ? (
         <div className="whitespace-pre">
-          {
-            compareLatestSourceGraphQLSchemaWithSubsets.data.breakingChanges.map(change => `+++${change.description.split(" ")[0]} \n`)
-          }
+          {compareLatestSourceGraphQLSchemaWithSubsets.data.breakingChanges.map(
+            (change) => `+++${change.description.split(" ")[0]!} \n`
+          )}
         </div>
       ) : (
         "No changes!"
@@ -130,7 +131,9 @@ function UpdateSchemaPopup({
                 <Button
                   variant="primary"
                   onClick={async () => {
-                    await updateSchemaMutation.mutateAsync({ graphQLSchema: newSchema });
+                    await updateSchemaMutation.mutateAsync({
+                      graphQLSchema: newSchema,
+                    });
                     closePopup();
                     refetchData();
                   }}

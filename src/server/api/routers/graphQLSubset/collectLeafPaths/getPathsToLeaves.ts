@@ -1,10 +1,10 @@
 import {
-  ArgumentNode,
-  ASTKindToNode,
-  FieldNode,
-  InlineFragmentNode,
-  ObjectFieldNode,
-  OperationDefinitionNode,
+  type ArgumentNode,
+  type ASTKindToNode,
+  type FieldNode,
+  type InlineFragmentNode,
+  type ObjectFieldNode,
+  type OperationDefinitionNode,
 } from "graphql";
 
 const VALID_ANCESTOR_NODES = [
@@ -39,15 +39,16 @@ export function getPathsToLeaves(
   >,
   node: ObjectFieldNode | FieldNode | ArgumentNode
 ) {
-  let fullPath: Array<ValidPathNode> = [];
+  const fullPath: Array<ValidPathNode> = [];
 
   ancestors.forEach((ancestor) => {
     if (Array.isArray(ancestor)) return;
-    if (ANCESTORS_TO_IGNORE.includes((ancestor as any).kind)) return;
-    if (!VALID_ANCESTOR_NODES.includes((ancestor as any).kind))
-      throw new Error(
-        `Ancestor was incorrect kind, found: ${(ancestor as any).kind}.`
-      );
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    const ancestorKind: string = (ancestor as any).kind;
+    if (ANCESTORS_TO_IGNORE.includes(ancestorKind)) return;
+    if (!VALID_ANCESTOR_NODES.includes(ancestorKind))
+      throw new Error(`Ancestor was incorrect kind, found: ${ancestorKind}.`);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     fullPath.push(ancestor as any);
   });
   if (!VALID_ANCESTOR_NODES.includes(node.kind))

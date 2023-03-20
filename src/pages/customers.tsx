@@ -9,13 +9,13 @@ import Pagination from "@cloudscape-design/components/pagination";
 import TextFilter from "@cloudscape-design/components/text-filter";
 
 import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
-import { Customer, Product } from "@prisma/client";
+import { type Customer, type Product } from "@prisma/client";
 import CustomerProduct from "~/sections/Customer/CustomersProduct";
 import CustomerPopup from "~/sections/CustomerPopup/CreateAndEdit/index";
 import CustomHead from "~/sections/CustomHead";
 import HomeButton from "~/sections/HomeButton";
-import { api } from "~/utils/api";
 import { SchemaExplorer } from "~/sections/SchemaExplorer";
+import { api } from "~/utils/api";
 
 const PAGE_SIZE = 8;
 
@@ -101,11 +101,13 @@ const Home: NextPage = () => {
                   },
                   {
                     id: "schemaExplorer",
-                    header:"Product Schema Explorer",
-                    content: (e) => <div>
-                      <SchemaExplorer schema={e.product.graphQLSchema}/>
-                    </div>
-                  }
+                    header: "Product Schema Explorer",
+                    content: (e) => (
+                      <div>
+                        <SchemaExplorer schema={e.product.graphQLSchema} />
+                      </div>
+                    ),
+                  },
                 ],
               }}
               cardsPerRow={[{ cards: 1 }, { minWidth: 500, cards: 2 }]}
@@ -113,7 +115,12 @@ const Home: NextPage = () => {
               loadingText="Loading Customers..."
               selectionType="multi"
               trackBy="id"
-              visibleSections={["createdAt", "description", "product", "schemaExplorer"]}
+              visibleSections={[
+                "createdAt",
+                "description",
+                "product",
+                "schemaExplorer",
+              ]}
               empty={
                 <Box textAlign="center" color="inherit">
                   <b>No resources</b>

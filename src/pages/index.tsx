@@ -1,7 +1,7 @@
 import Link from "next/link";
 import CustomHead from "~/sections/CustomHead";
 
-export default () => {
+const Index = () => {
   return (
     <>
       <CustomHead />
@@ -50,3 +50,5 @@ export default () => {
     </>
   );
 };
+
+export default Index;

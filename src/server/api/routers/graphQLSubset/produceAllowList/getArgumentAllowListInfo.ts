@@ -1,4 +1,4 @@
-import { DocumentNode, TypeNode } from "graphql";
+import { type DocumentNode, type TypeNode } from "graphql";
 import { type ArgumentPathNodes } from "../collectLeafPaths/getPathsToLeaves";
 import { getQueryOperation } from "./getQueryOperation";
 import { resolveRootType } from "./resolveRootType";
@@ -12,7 +12,10 @@ export const getArgumentAllowListInfo = (
     (definition) =>
       definition.kind === "ObjectTypeDefinition" &&
       definition.name.value === "Query"
-  )!;
+  );
+
+  if (!queryObjectTypeDefinition)
+    throw new Error("Failed to find queryObjectTypeDefinition");
 
   if (queryObjectTypeDefinition.kind !== "ObjectTypeDefinition")
     throw new Error("Query Type Definition is not the correct kind");
@@ -44,12 +47,14 @@ export const getArgumentAllowListInfo = (
       return definition.name.value === state.fieldType;
     });
 
+    if (!pathType) throw new Error("Pathtype is falsy");
+
     if (
-      pathType?.kind !== "ObjectTypeDefinition" &&
-      pathType?.kind !== "InterfaceTypeDefinition" &&
-      pathType?.kind !== "InputObjectTypeDefinition"
+      pathType.kind !== "ObjectTypeDefinition" &&
+      pathType.kind !== "InterfaceTypeDefinition" &&
+      pathType.kind !== "InputObjectTypeDefinition"
     )
-      throw new Error(`${pathType} is not of type ObjectTypeDefinition`);
+      throw new Error(`${pathType.kind} is not of type ObjectTypeDefinition`);
 
     const nextNode = array[currentIndex + 1];
 
@@ -107,7 +112,7 @@ export const getArgumentAllowListInfo = (
           throw new Error("Found InputObjectTypeDefinition");
 
         nextPathType = pathType.fields?.find((field) => {
-          return field.name.value! === currentNode.name.value;
+          return field.name.value === currentNode.name.value;
         })?.type;
         break;
       case "InlineFragment":

@@ -9,14 +9,18 @@ import Pagination from "@cloudscape-design/components/pagination";
 import TextFilter from "@cloudscape-design/components/text-filter";
 
 import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
-import { Customer, GraphQLSubset, Product } from "@prisma/client";
+import {
+  type Customer,
+  type GraphQLSubset,
+  type Product,
+} from "@prisma/client";
 import CustomHead from "~/sections/CustomHead";
 import HomeButton from "~/sections/HomeButton";
 import ProductPopup from "~/sections/ProductPopup/CreateAndEdit/index";
-import { api } from "~/utils/api";
-import SubsetDisplay from "~/sections/ProductPopup/view/SubsetDisplay";
 import CustomersDisplay from "~/sections/ProductPopup/view/CustomersDisplay";
+import SubsetDisplay from "~/sections/ProductPopup/view/SubsetDisplay";
 import { SchemaExplorer } from "~/sections/SchemaExplorer";
+import { api } from "~/utils/api";
 
 const PAGE_SIZE = 8;
 
@@ -94,15 +98,16 @@ const Home: NextPage = () => {
                     content: (e) => e.description,
                   },
                   {
-                    id:"customers",
+                    id: "customers",
                     header: "Customers",
-                    content: (e) => <CustomersDisplay customers={e.customers}/>
+                    content: (e) => (
+                      <CustomersDisplay customers={e.customers} />
+                    ),
                   },
                   {
                     id: "graphQLSubsets",
                     header: "GraphQL Subsets",
-                    content: (e) =>
-                      <SubsetDisplay subsets={e.subsets}/>
+                    content: (e) => <SubsetDisplay subsets={e.subsets} />,
                   },
                   {
                     id: "graphQLSchema",
@@ -115,11 +120,13 @@ const Home: NextPage = () => {
                   },
                   {
                     id: "schemaExplorer",
-                    header:"Product Schema Explorer",
-                    content: (e) => <div>
-                      <SchemaExplorer schema={e.graphQLSchema}/>
-                    </div>
-                  }
+                    header: "Product Schema Explorer",
+                    content: (e) => (
+                      <div>
+                        <SchemaExplorer schema={e.graphQLSchema} />
+                      </div>
+                    ),
+                  },
                 ],
               }}
               cardsPerRow={[{ cards: 1 }, { minWidth: 500, cards: 2 }]}
@@ -127,7 +134,14 @@ const Home: NextPage = () => {
               loadingText="Loading Products..."
               selectionType="multi"
               trackBy="id"
-              visibleSections={["createdAt", "graphQLSubsets", "graphQLSchema", "description", "customers", "schemaExplorer"]}
+              visibleSections={[
+                "createdAt",
+                "graphQLSubsets",
+                "graphQLSchema",
+                "description",
+                "customers",
+                "schemaExplorer",
+              ]}
               empty={
                 <Box textAlign="center" color="inherit">
                   <b>No resources</b>

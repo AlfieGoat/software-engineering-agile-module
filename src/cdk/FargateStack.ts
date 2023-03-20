@@ -1,5 +1,5 @@
 import { Stack, type StackProps } from "aws-cdk-lib";
-import { ICertificate } from "aws-cdk-lib/aws-certificatemanager";
+import { type ICertificate } from "aws-cdk-lib/aws-certificatemanager";
 import { SubnetType, Vpc } from "aws-cdk-lib/aws-ec2";
 import { DockerImageAsset } from "aws-cdk-lib/aws-ecr-assets";
 import {
@@ -13,7 +13,7 @@ import {
 import { ApplicationLoadBalancedFargateService } from "aws-cdk-lib/aws-ecs-patterns";
 import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
-import { IHostedZone } from "aws-cdk-lib/aws-route53";
+import { type IHostedZone } from "aws-cdk-lib/aws-route53";
 import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 import { type Construct } from "constructs";
 
@@ -110,7 +110,9 @@ export class FargateStack extends Stack {
     });
 
     taskDefinition.addContainer(`${id}-PostgresContainer`, {
-      image: ContainerImage.fromRegistry("public.ecr.aws/ubuntu/postgres:latest"),
+      image: ContainerImage.fromRegistry(
+        "public.ecr.aws/ubuntu/postgres:latest"
+      ),
       portMappings: [{ containerPort: 5432, hostPort: 5432 }],
       environment: {
         POSTGRES_PASSWORD: secretConfig
@@ -129,11 +131,11 @@ export class FargateStack extends Stack {
         taskDefinition,
         publicLoadBalancer: true,
         assignPublicIp: true,
-        
+
         certificate: props.certificate,
         domainName: props.domainName,
         domainZone: props.hostedZone,
-        redirectHTTP: true
+        redirectHTTP: true,
       }
     );
 

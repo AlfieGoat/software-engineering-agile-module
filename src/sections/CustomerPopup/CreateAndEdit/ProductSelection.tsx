@@ -21,7 +21,7 @@ export const ProductSelection = () => {
 
   useEffect(() => {
     setProductComponentLoading(isLoading);
-  }, [isLoading]);
+  }, [isLoading, setProductComponentLoading]);
 
   if (!data) return <></>;
 
@@ -45,15 +45,15 @@ export const ProductSelection = () => {
         }}
       />
       <RadioGroup
-        onChange={({ detail }) =>{
-        console.log(formData, detail.value);
+        onChange={({ detail }) => {
+          console.log(formData, detail.value);
 
           setFormData(
             produce((draft) => {
               draft.productId = detail.value;
             }, formData)
-          )}
-        }
+          );
+        }}
         value={formData.productId}
         items={data.pages[currentPageIndex]?.items.map((product) => ({
           value: product.id,

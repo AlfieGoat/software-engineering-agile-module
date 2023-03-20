@@ -1,7 +1,7 @@
 import { Button } from "@cloudscape-design/components";
 import Link from "next/link";
 
-export default () => {
+const HomeButton = () => {
   return (
     <span className="mr-4">
       <Link href="/">
@@ -10,3 +10,5 @@ export default () => {
     </span>
   );
 };
+
+export default HomeButton;

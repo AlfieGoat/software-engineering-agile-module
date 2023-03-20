@@ -1,6 +1,6 @@
 import produce from "immer";
-import { FormData } from "./atoms";
-import { CreateNewCustomerProps, EditCustomerProps } from "./index";
+import { type FormData } from "./atoms";
+import { type CreateNewCustomerProps, type EditCustomerProps } from "./index";
 
 export function setInitialFormData(
   props: CreateNewCustomerProps | EditCustomerProps,

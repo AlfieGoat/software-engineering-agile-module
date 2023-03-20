@@ -1,4 +1,4 @@
-import { TypeNode } from "graphql";
+import { type TypeNode } from "graphql";
 
 export const resolveRootType = (type: TypeNode): string => {
   switch (type.kind) {

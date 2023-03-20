@@ -1,12 +1,19 @@
-import { api } from "~/utils/api";
-import { FormData } from "./atoms";
-import { CreateNewGraphQLSubsetsProps, EditGraphQLSubsetPopupProps } from "./index";
+import { type api } from "~/utils/api";
+import { type FormData } from "./atoms";
+import {
+  type CreateNewGraphQLSubsetsProps,
+  type EditGraphQLSubsetPopupProps,
+} from "./index";
 
 export const onSubmit = async (
   formData: FormData,
   props: CreateNewGraphQLSubsetsProps | EditGraphQLSubsetPopupProps,
-  productCreateMutation: ReturnType<typeof api.graphQLSubset.create.useMutation>,
-  productUpdateMutation: ReturnType<typeof api.graphQLSubset.updateById.useMutation>
+  productCreateMutation: ReturnType<
+    typeof api.graphQLSubset.create.useMutation
+  >,
+  productUpdateMutation: ReturnType<
+    typeof api.graphQLSubset.updateById.useMutation
+  >
 ) => {
   if (props.type === "Create") {
     await productCreateMutation.mutateAsync({
