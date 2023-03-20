@@ -19,7 +19,7 @@ export const sourceGraphQLSchemaRouter = createTRPCRouter({
 
       // console.log(composeAndValidate([{name: "Subgraph", typeDefs: parse(graphQLSchema) }]))
 
-      console.log(parse(graphQLSchema));
+      // console.log(parse(graphQLSchema));
 
       // validateAndParseGraphQLSchema(graphQLSchema);
 

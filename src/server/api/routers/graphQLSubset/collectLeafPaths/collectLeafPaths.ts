@@ -25,6 +25,12 @@ export function collectLeafPaths(
         leafPaths.push(fullPath);
       },
     },
+    InlineFragment: {
+      enter(fieldNode, key, parent, path, ancestors) {
+        const fullPath = getPathsToLeaves(ancestors, fieldNode);
+        leafPaths.push(fullPath);
+      },
+    }
   };
 
   // Visit the parsed query with the custom visitor

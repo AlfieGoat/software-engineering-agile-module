@@ -37,7 +37,7 @@ export function getPathsToLeaves(
     | ASTKindToNode[keyof ASTKindToNode]
     | ReadonlyArray<ASTKindToNode[keyof ASTKindToNode]>
   >,
-  node: ObjectFieldNode | FieldNode | ArgumentNode
+  node: ObjectFieldNode | FieldNode | ArgumentNode | InlineFragmentNode
 ) {
   const fullPath: Array<ValidPathNode> = [];
 

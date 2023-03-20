@@ -1,11 +1,11 @@
 import { type DocumentNode, type TypeNode } from "graphql";
-import { type FieldPathsNodes } from "../collectLeafPaths/getPathsToLeaves";
+import { type FieldPathsNodes as FieldPathsNode } from "../collectLeafPaths/getPathsToLeaves";
 import { getQueryOperation } from "./getQueryOperation";
 import { resolveRootType } from "./resolveRootType";
 import { type Field } from "./types";
 
 export const getFieldAllowListInfo = (
-  field: FieldPathsNodes[],
+  field: FieldPathsNode[],
   schema: DocumentNode
 ): Field => {
   const queryObjectTypeDefinition = schema.definitions.find(
@@ -27,7 +27,19 @@ export const getFieldAllowListInfo = (
     fieldName: "",
   };
 
-  const reducer = (state: Field, currentField: FieldPathsNodes): Field => {
+  const reducer = (state: Field, currentField: FieldPathsNode, currentIndex: number, array: FieldPathsNode[]): Field => {
+    if(currentField.kind === "InlineFragment" && array.length === currentIndex + 1){
+      const currentFieldNamedType = currentField.typeCondition;
+      if(!currentFieldNamedType) throw new Error("Expected current InlineFragment to have a named type.");
+
+      return {
+        parentType: state.fieldType,
+        fieldType: currentField.typeCondition.name.value,
+        fieldName: "",
+        type: "field"
+      }
+    }
+
     const pathType = schema.definitions.find((definition) => {
       if (
         definition.kind !== "ObjectTypeDefinition" &&

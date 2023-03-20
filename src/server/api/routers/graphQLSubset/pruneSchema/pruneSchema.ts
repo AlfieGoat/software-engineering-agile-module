@@ -1,4 +1,10 @@
-import { visit, type ASTVisitor, type DocumentNode } from "graphql";
+import {
+  visit,
+  type ASTVisitor,
+  type DocumentNode,
+  type InterfaceTypeDefinitionNode,
+  type ObjectTypeDefinitionNode,
+} from "graphql";
 import produce from "immer";
 import { type Argument, type Field } from "../produceAllowList/types";
 
@@ -53,13 +59,12 @@ export function pruneSchema(
         definition.fields?.forEach((field) => {
           const parentTypeAllowListInformation =
             argumentAllowList[definition.name.value];
-          if (!parentTypeAllowListInformation) return false;
-
-          field.arguments = field.arguments?.filter((argument) =>
-            parentTypeAllowListInformation.some(
+          field.arguments = field.arguments?.filter((argument) => {
+            if (!parentTypeAllowListInformation) return false;
+            return parentTypeAllowListInformation.some(
               (allowedItem) => allowedItem.argumentName === argument.name.value
-            )
-          );
+            );
+          });
         });
       } else if (definition.kind === "InputObjectTypeDefinition") {
         definition.fields = definition.fields?.filter((field) => {
@@ -83,6 +88,7 @@ export function pruneSchema(
     };
 
     visit(draft, visitor);
+
     draft.definitions = draft.definitions.filter((definition) => {
       if (definition.kind === "UnionTypeDefinition")
         return typesUsedInSchema.has(definition.name.value);
@@ -94,6 +100,21 @@ export function pruneSchema(
         return typesUsedInSchema.has(definition.name.value);
 
       return true;
+    });
+
+    const definedTypesAndInterface = (
+      draft.definitions.filter(
+        (definition) =>
+          definition.kind === "InterfaceTypeDefinition" ||
+          definition.kind === "ObjectTypeDefinition"
+      ) as Array<InterfaceTypeDefinitionNode | ObjectTypeDefinitionNode>
+    ).map((definition) => definition.name.value);
+
+    draft.definitions.forEach((definition) => {
+      if (definition.kind !== "UnionTypeDefinition") return;
+      definition.types = definition.types?.filter((type) => {
+        return definedTypesAndInterface.includes(type.name.value);
+      });
     });
   });
 
