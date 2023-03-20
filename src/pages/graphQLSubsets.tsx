@@ -33,8 +33,10 @@ interface NonePopupState {
 type Popup = CreatePopupState | EditPopupState | NonePopupState;
 
 const Home: NextPage = () => {
+  const [filterText, setFilterText] = useState<string | null>(null);
+
   const graphQLSubset = api.graphQLSubset.getAll.useInfiniteQuery(
-    { limit: PAGE_SIZE },
+    { limit: PAGE_SIZE, filterText },
     { getNextPageParam: (lastPage) => lastPage.nextCursor }
   );
 
@@ -60,8 +62,6 @@ const Home: NextPage = () => {
   if (!showChild) {
     return null;
   }
-
-  if (!graphQLSubset.data) return null;
 
   return (
     <>
@@ -114,7 +114,7 @@ const Home: NextPage = () => {
                 ],
               }}
               cardsPerRow={[{ cards: 1 }, { minWidth: 500, cards: 2 }]}
-              items={graphQLSubset.data.pages[paginationIndex]?.items ?? []}
+              items={graphQLSubset.data?.pages[paginationIndex]?.items ?? []}
               loadingText="Loading GraphQL Subsets..."
               selectionType="multi"
               trackBy="id"
@@ -142,7 +142,11 @@ const Home: NextPage = () => {
               filter={
                 <TextFilter
                   filteringPlaceholder="Find resources"
-                  filteringText=""
+                  filteringText={filterText || ""}
+                  onChange={(data) => {
+                    setPaginationIndex(0);
+                    setFilterText(data.detail.filteringText);
+                  }}
                 />
               }
               header={
@@ -150,14 +154,14 @@ const Home: NextPage = () => {
                   counter={
                     selectedGraphQLSubset.length
                       ? `(${selectedGraphQLSubset.length}/${
-                          graphQLSubset.data.pages.flatMap(
+                          graphQLSubset.data?.pages?.flatMap(
                             (graphQLSubset) => graphQLSubset.items
-                          ).length
+                          ).length || 0
                         })`
                       : `(${
-                          graphQLSubset.data.pages.flatMap(
+                          graphQLSubset.data?.pages?.flatMap(
                             (graphQLSubset) => graphQLSubset.items
-                          ).length
+                          ).length || 0
                         })`
                   }
                   actions={
@@ -207,9 +211,9 @@ const Home: NextPage = () => {
                 <Pagination
                   currentPageIndex={paginationIndex + 1}
                   pagesCount={
-                    graphQLSubset.hasNextPage
-                      ? graphQLSubset.data.pages.length + 1
-                      : graphQLSubset.data.pages.length
+                    graphQLSubset.hasNextPage && graphQLSubset.data
+                      ? graphQLSubset.data?.pages.length + 1
+                      : graphQLSubset.data?.pages.length || 0
                   }
                   onNextPageClick={async () => {
                     await graphQLSubset.fetchNextPage();
