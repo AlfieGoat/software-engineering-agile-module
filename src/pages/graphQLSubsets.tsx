@@ -163,7 +163,6 @@ const Home: NextPage = () => {
                   actions={
                     <SpaceBetween size="xs" direction="horizontal">
                       <Button
-                        data-testid="header-btn-edit"
                         disabled={selectedGraphQLSubset.length !== 1}
                         onClick={() => {
                           setPopupState({
@@ -174,7 +173,6 @@ const Home: NextPage = () => {
                         Edit
                       </Button>
                       <Button
-                        data-testid="header-btn-delete"
                         disabled={selectedGraphQLSubset.length < 1}
                         onClick={async () => {
                           await Promise.all(
@@ -191,7 +189,6 @@ const Home: NextPage = () => {
                         Delete
                       </Button>
                       <Button
-                        data-testid="header-btn-create"
                         variant="primary"
                         onClick={() => {
                           setPopupState({ state: "Create" });
