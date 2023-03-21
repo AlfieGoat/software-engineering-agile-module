@@ -2,8 +2,8 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedAdminProcedure } from "~/server/api/trpc";
-import { updateProduct } from "../product/graphQL";
-import { validateAndParseGraphQLSchema } from "./graphQL";
+import { updateProduct } from "../product/updateProduct";
+import { validateAndParseGraphQLSchema } from "./validateAndParseGraphQLSchema";
 
 import { parse, print } from "graphql";
 import { collectLeafPaths } from "./collectLeafPaths/collectLeafPaths";
@@ -71,7 +71,9 @@ export const graphQLSubsetRouter = createTRPCRouter({
               where: {
                 OR: [
                   { name: { contains: filterText, mode: "insensitive" } },
-                  { description: { contains: filterText, mode: "insensitive" } },
+                  {
+                    description: { contains: filterText, mode: "insensitive" },
+                  },
                 ],
               },
             }

@@ -6,11 +6,6 @@ export const validateAndParseGraphQLSchema = (graphQLSchema: string) => {
   try {
     parsedGraphQLSchema = parse(graphQLSchema);
     buildASTSchema(parsedGraphQLSchema);
-
-    // console.log(JSON.stringify(parsedGraphQLSchema));
-    // console.log("querytype", builtSchema.getQueryType())
-
-    // console.log(validateSchema(builtSchema));
   } catch (e) {
     throw new TRPCError({
       code: "BAD_REQUEST",

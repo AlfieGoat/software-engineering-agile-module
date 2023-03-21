@@ -3,7 +3,8 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { mergeSchemas, updateProduct } from "./graphQL";
+import { mergeSchemas } from "./mergeSchemas";
+import { updateProduct } from "./updateProduct";
 
 const DEFAULT_PAGE_SIZE = 50;
 const MAX_PAGE_SIZE = 100;

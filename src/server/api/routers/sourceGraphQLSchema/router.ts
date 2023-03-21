@@ -1,11 +1,10 @@
 import { printWithComments } from "@graphql-toolkit/schema-merging";
 import { TRPCError } from "@trpc/server";
-import { parse } from "graphql";
 import { getDiff } from "graphql-schema-diff";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedAdminProcedure } from "~/server/api/trpc";
-import { mergeSchemas } from "../product/graphQL";
+import { mergeSchemas } from "../product/mergeSchemas";
 
 export const sourceGraphQLSchemaRouter = createTRPCRouter({
   create: protectedAdminProcedure
@@ -17,16 +16,22 @@ export const sourceGraphQLSchemaRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { graphQLSchema } = input;
 
-      // console.log(composeAndValidate([{name: "Subgraph", typeDefs: parse(graphQLSchema) }]))
+      const sourceGraphQLSchema = await ctx.prisma.$transaction(async (tx) => {
+        const oldGraphQLSchema = await tx.sourceGraphQLSchema.findFirst({
+          orderBy: { createdAt: "desc" },
+        });
 
-      // console.log(parse(graphQLSchema));
+        await tx.sourceGraphQLSchema.delete({
+          where: { id: oldGraphQLSchema?.id },
+        });
 
-      // validateAndParseGraphQLSchema(graphQLSchema);
+        const sourceGraphQLSchema = await tx.sourceGraphQLSchema.create({
+          data: {
+            graphQLSchema,
+          },
+        });
 
-      const sourceGraphQLSchema = await ctx.prisma.sourceGraphQLSchema.create({
-        data: {
-          graphQLSchema,
-        },
+        return sourceGraphQLSchema;
       });
 
       return sourceGraphQLSchema;
