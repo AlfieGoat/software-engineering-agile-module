@@ -8,10 +8,10 @@ interface CustomerProductProps {
 }
 
 const CustomerProduct = ({ productId, productName }: CustomerProductProps) => {
-  const product = api.product.getById.useQuery({ productId });
-
   const [showCustomerProductPopup, setShowCustomerProductPopup] =
     useState(false);
+
+  const product = api.product.getById.useQuery({ productId });
 
   return (
     <>

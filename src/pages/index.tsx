@@ -1,6 +1,20 @@
 import Link from "next/link";
 import CustomHead from "~/sections/CustomHead";
 
+const PAGES = [
+  { href: "sourceGraphQLSchema", text: "Source Schema" },
+  { href: "graphQLSubsets", text: "GraphQL Subsets" },
+  { href: "products", text: "Products" },
+  { href: "customers", text: "Customers" },
+];
+
+const TITLE = "The GraphQL Product Builder";
+
+const PARAGRAPH_DESCRIPTION =
+  "The GraphQL Product Builder allows GraphQL schemas to be dynamically applied to each GraphQL customer. A product is built up of GraphQL subsets, once a product has been configured the product can be assigned to as many customers as you want!";
+
+const FOOTER_TEXT = "Made by Alfie Goatcher with ❤️";
+
 const Index = () => {
   return (
     <>
@@ -8,21 +22,13 @@ const Index = () => {
       <div className="mx-auto flex min-h-screen w-full flex-col px-1 text-gray-700 antialiased">
         <div className="mw-auto flex flex-1 flex-col items-center">
           <h1 className="mb-8 mt-48 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
-            The GraphQL Product Builder
+            {TITLE}
           </h1>
           <p className="mb-8 text-center text-lg font-normal text-gray-500 dark:text-gray-400 sm:px-16 lg:text-xl xl:px-48">
-            The GraphQL Product Builder allows GraphQL schemas to be dynamically
-            applied to each GraphQL customer. A product is built up of GraphQL
-            subsets, once a product has been configured the product can be
-            assigned to as many customers as you want!
+            {PARAGRAPH_DESCRIPTION}
           </p>
           <div className="flex space-x-4">
-            {[
-              { href: "sourceGraphQLSchema", text: "Source Schema" },
-              { href: "graphQLSubsets", text: "GraphQL Subsets" },
-              { href: "products", text: "Products" },
-              { href: "customers", text: "Customers" },
-            ].map((page) => {
+            {PAGES.map((page) => {
               return (
                 <Link
                   className="inline-flex items-center justify-center rounded-lg bg-blue-700 px-5 py-3 text-center text-base font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900"
@@ -44,7 +50,7 @@ const Index = () => {
           </div>
         </div>
         <div className="border-gray-300 py-8 text-center text-sm font-bold">
-          Made by Alfie Goatcher with ❤️
+          {FOOTER_TEXT}
         </div>
       </div>
     </>

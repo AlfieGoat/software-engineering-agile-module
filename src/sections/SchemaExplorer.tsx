@@ -14,8 +14,9 @@ export const SchemaExplorer = (props: {
 
   const [query, setQuery] = useState("{}");
   if (
-    !props.schema &&
-    (sourceGraphQLSchema.isLoading || !sourceGraphQLSchema.data)
+    !props.schema ||
+    sourceGraphQLSchema.isLoading ||
+    !sourceGraphQLSchema.data
   )
     return <></>;
 
@@ -25,7 +26,7 @@ export const SchemaExplorer = (props: {
       showAttribution={false}
       explorerIsOpen={true}
       schema={buildSchema(
-        props.schema ? props.schema : sourceGraphQLSchema.data!.graphQLSchema
+        props.schema ? props.schema : sourceGraphQLSchema.data.graphQLSchema
       )}
       onEdit={(query: string) => {
         setQuery(query);

@@ -11,15 +11,15 @@ import HomeButton from "~/sections/HomeButton";
 import { api } from "~/utils/api";
 
 const SourceGraphQLSchema = () => {
-  const sourceGraphQLSchema = api.sourceGraphQLSchema.getLatest.useQuery();
   const [showUpdateSchemaPopup, setShowUpdateSchemaPopup] = useState(false);
+
+  const sourceGraphQLSchema = api.sourceGraphQLSchema.getLatest.useQuery();
 
   // Wait until after client-side hydration to show
   const [showChild, setShowChild] = useState(false);
   useEffect(() => {
     setShowChild(true);
   }, []);
-
   if (!showChild) {
     return null;
   }

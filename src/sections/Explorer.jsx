@@ -2,6 +2,13 @@
 // @ts-nocheck
 'use strict';
 
+/* 
+ * This Explorer is pulled in from https://github.com/OneGraph/graphiql-explorer 
+ * The repository hasn't had it's peer dependencies updated.
+ * Once the peer dependencies have been updated to include React 18, then we can remove this
+ * And replace it with the correct npm dependency.
+ */
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });

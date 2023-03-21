@@ -1,8 +1,8 @@
 import produce from "immer";
-import { FormData } from "./atoms";
+import { type FormData } from "./atoms";
 import {
-  CreateNewGraphQLSubsetsProps,
-  EditGraphQLSubsetPopupProps,
+  type CreateNewGraphQLSubsetsProps,
+  type EditGraphQLSubsetPopupProps,
 } from "./index";
 
 export function setInitialFormData(

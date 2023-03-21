@@ -1,9 +1,8 @@
 import { type NextPage } from "next";
 import { useEffect, useState } from "react";
 
-import Box from "@cloudscape-design/components/box";
 import Button from "@cloudscape-design/components/button";
-import Cards from "@cloudscape-design/components/cards";
+import Cards, { type CardsProps } from "@cloudscape-design/components/cards";
 import Header from "@cloudscape-design/components/header";
 import Pagination from "@cloudscape-design/components/pagination";
 import TextFilter from "@cloudscape-design/components/text-filter";
@@ -12,50 +11,73 @@ import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
 import { type GraphQLSubset, type Product } from "@prisma/client";
 import CustomerProduct from "~/sections/Customer/CustomersProduct";
 import CustomHead from "~/sections/CustomHead";
-import GraphQLSubsetPopup from "~/sections/GraphQLSubsetPopup";
+import { EmptyDisplay } from "~/sections/EmptyDisplay";
+import GraphQLSubsetPopup from "~/sections/GraphQLSubsetPopup/CreateAndEdit";
 import HomeButton from "~/sections/HomeButton";
+import { type Popup } from "~/sections/sharedPopup/state";
 import { api } from "~/utils/api";
+import { createVisibleSections } from "~/utils/cloudscapeCardUtils/createVisibleSections";
 
 const PAGE_SIZE = 8;
 
-interface CreatePopupState {
-  state: "Create";
-}
+type Item = GraphQLSubset & {
+  products: Product[];
+};
 
-interface EditPopupState {
-  state: "Edit";
-}
-
-interface NonePopupState {
-  state: "None";
-}
-
-type Popup = CreatePopupState | EditPopupState | NonePopupState;
+const CARD_DEFINITION: CardsProps.CardDefinition<Item> = {
+  header: (e) => e.name,
+  sections: [
+    {
+      id: "createdAt",
+      header: "Created At",
+      content: (e) => e.createdAt.toLocaleString(),
+    },
+    {
+      id: "description",
+      header: "Description",
+      content: (e) => e.description,
+    },
+    {
+      id: "products",
+      header: "Products using this subset",
+      content: (e) =>
+        e.products.map((product) => (
+          <li className="list-inside list-disc" key={product.id}>
+            <CustomerProduct
+              productId={product.id}
+              productName={product.name}
+            />
+          </li>
+        )),
+    },
+    {
+      id: "schema",
+      header: "Schema",
+      content: (e: GraphQLSubset) => (
+        <div className="whitespace-pre-wrap">{e.graphQLSchema}</div>
+      ),
+    },
+  ],
+};
 
 const Home: NextPage = () => {
   const [filterText, setFilterText] = useState<string | null>(null);
+  const [paginationIndex, setPaginationIndex] = useState(0);
+  const [popupState, setPopupState] = useState<Popup>({ state: "None" });
+  const [selectedGraphQLSubset, setSelectedGraphQLSubset] = useState<Item[]>(
+    []
+  );
 
   const graphQLSubset = api.graphQLSubset.getAll.useInfiniteQuery(
     { limit: PAGE_SIZE, filterText },
     { getNextPageParam: (lastPage) => lastPage.nextCursor }
   );
 
-  const [popupState, setPopupState] = useState<Popup>({ state: "None" });
-
   const graphQLSubsetDeleteMutation =
     api.graphQLSubset.deleteById.useMutation();
 
-  const [selectedGraphQLSubset, setSelectedGraphQLSubset] = useState<
-    (GraphQLSubset & {
-      products: Product[];
-    })[]
-  >([]);
-
-  const [showChild, setShowChild] = useState(false);
-
-  const [paginationIndex, setPaginationIndex] = useState(0);
-
   // Wait until after client-side hydration to show
+  const [showChild, setShowChild] = useState(false);
   useEffect(() => {
     setShowChild(true);
   }, []);
@@ -65,7 +87,7 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <CustomHead pageName="Subsets"/>
+      <CustomHead pageName="Subsets" />
       <main className="flex min-h-screen flex-col ">
         <AppLayout
           content={
@@ -76,69 +98,14 @@ const Home: NextPage = () => {
               }
               selectedItems={selectedGraphQLSubset}
               loading={graphQLSubset.isLoading}
-              cardDefinition={{
-                header: (e) => e.name,
-                sections: [
-                  {
-                    id: "createdAt",
-                    header: "Created At",
-                    content: (e) => e.createdAt.toLocaleString(),
-                  },
-                  {
-                    id: "description",
-                    header: "Description",
-                    content: (e) => e.description,
-                  },
-                  {
-                    id: "products",
-                    header: "Products using this subset",
-                    content: (e) =>
-                      e.products.map((product) => (
-                        <li className="list-inside list-disc" key={product.id}>
-                          <CustomerProduct
-                            productId={product.id}
-                            productName={product.name}
-                          />
-                        </li>
-                      )),
-                  },
-                  {
-                    id: "schema",
-                    header: "Schema",
-                    content: (e: GraphQLSubset) => (
-                      <div className="whitespace-pre-wrap">
-                        {e.graphQLSchema}
-                      </div>
-                    ),
-                  },
-                ],
-              }}
+              cardDefinition={CARD_DEFINITION}
               cardsPerRow={[{ cards: 1 }, { minWidth: 500, cards: 2 }]}
               items={graphQLSubset.data?.pages[paginationIndex]?.items ?? []}
               loadingText="Loading GraphQL Subsets..."
               selectionType="multi"
               trackBy="id"
-              visibleSections={[
-                "createdAt",
-                "schema",
-                "description",
-                "products",
-              ]}
-              empty={
-                <Box textAlign="center" color="inherit">
-                  <b>No resources</b>
-                  <Box padding={{ bottom: "s" }} variant="p" color="inherit">
-                    No resources to display.
-                  </Box>
-                  <Button
-                    onClick={() => {
-                      setPopupState({ state: "Create" });
-                    }}
-                  >
-                    Create resource
-                  </Button>
-                </Box>
-              }
+              visibleSections={createVisibleSections<Item>(CARD_DEFINITION)}
+              empty={<EmptyDisplay setPopupState={setPopupState} />}
               filter={
                 <TextFilter
                   filteringPlaceholder="Find subset"

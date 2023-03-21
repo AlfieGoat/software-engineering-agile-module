@@ -1,9 +1,8 @@
 import { type NextPage } from "next";
 import { useEffect, useState } from "react";
 
-import Box from "@cloudscape-design/components/box";
 import Button from "@cloudscape-design/components/button";
-import Cards from "@cloudscape-design/components/cards";
+import Cards, { type CardsProps } from "@cloudscape-design/components/cards";
 import Header from "@cloudscape-design/components/header";
 import Pagination from "@cloudscape-design/components/pagination";
 import TextFilter from "@cloudscape-design/components/text-filter";
@@ -15,47 +14,66 @@ import CustomerPopup from "~/sections/CustomerPopup/CreateAndEdit/index";
 import CustomHead from "~/sections/CustomHead";
 import HomeButton from "~/sections/HomeButton";
 import { SchemaExplorer } from "~/sections/SchemaExplorer";
+import { type Popup } from "~/sections/sharedPopup/state";
 import { api } from "~/utils/api";
+import { EmptyDisplay } from "../sections/EmptyDisplay";
+import { createVisibleSections } from "~/utils/cloudscapeCardUtils/createVisibleSections";
 
 const PAGE_SIZE = 8;
 
-interface CreatePopupState {
-  state: "Create";
-}
+type Item = Customer & {
+  product: Product;
+};
 
-interface EditPopupState {
-  state: "Edit";
-}
-
-interface NonePopupState {
-  state: "None";
-}
-
-type Popup = CreatePopupState | EditPopupState | NonePopupState;
+const CARD_DEFINITION: CardsProps.CardDefinition<Item> = {
+  header: (e) => e.name,
+  sections: [
+    {
+      id: "createdAt",
+      header: "Created At",
+      content: (e) => e.createdAt.toLocaleString(),
+    },
+    {
+      id: "description",
+      header: "Description",
+      content: (e) => e.description,
+    },
+    {
+      id: "product",
+      header: "Product",
+      content: (e) => (
+        <CustomerProduct
+          productId={e.product.id}
+          productName={e.product.name}
+        />
+      ),
+    },
+    {
+      id: "schemaExplorer",
+      header: "Product Schema Explorer",
+      content: (e) => (
+        <div>
+          <SchemaExplorer schema={e.product.graphQLSchema} />
+        </div>
+      ),
+    },
+  ],
+};
 
 const Home: NextPage = () => {
   const [filterText, setFilterText] = useState<string | null>(null);
+  const [popupState, setPopupState] = useState<Popup>({ state: "None" });
+  const [paginationIndex, setPaginationIndex] = useState(0);
+  const [selectedCustomers, setSelectedCustomers] = useState<Item[]>([]);
 
   const customers = api.customer.getAll.useInfiniteQuery(
     { limit: PAGE_SIZE, filterText },
     { getNextPageParam: (lastPage) => lastPage.nextCursor }
   );
-
-  const [popupState, setPopupState] = useState<Popup>({ state: "None" });
-
   const customersDeleteMutation = api.customer.deleteById.useMutation();
 
-  const [selectedCustomers, setSelectedCustomers] = useState<
-    (Customer & {
-      product: Product;
-    })[]
-  >([]);
-
-  const [showChild, setShowChild] = useState(false);
-
-  const [paginationIndex, setPaginationIndex] = useState(0);
-
   // Wait until after client-side hydration to show
+  const [showChild, setShowChild] = useState(false);
   useEffect(() => {
     setShowChild(true);
   }, []);
@@ -76,66 +94,14 @@ const Home: NextPage = () => {
               }
               selectedItems={selectedCustomers}
               loading={customers.isLoading}
-              cardDefinition={{
-                header: (e) => e.name,
-                sections: [
-                  {
-                    id: "createdAt",
-                    header: "Created At",
-                    content: (e) => e.createdAt.toLocaleString(),
-                  },
-                  {
-                    id: "description",
-                    header: "Description",
-                    content: (e) => e.description,
-                  },
-                  {
-                    id: "product",
-                    header: "Product",
-                    content: (e) => (
-                      <CustomerProduct
-                        productId={e.product.id}
-                        productName={e.product.name}
-                      />
-                    ),
-                  },
-                  {
-                    id: "schemaExplorer",
-                    header: "Product Schema Explorer",
-                    content: (e) => (
-                      <div>
-                        <SchemaExplorer schema={e.product.graphQLSchema} />
-                      </div>
-                    ),
-                  },
-                ],
-              }}
+              cardDefinition={CARD_DEFINITION}
               cardsPerRow={[{ cards: 1 }, { minWidth: 500, cards: 2 }]}
               items={customers.data?.pages[paginationIndex]?.items ?? []}
               loadingText="Loading Customers..."
               selectionType="multi"
               trackBy="id"
-              visibleSections={[
-                "createdAt",
-                "description",
-                "product",
-                "schemaExplorer",
-              ]}
-              empty={
-                <Box textAlign="center" color="inherit">
-                  <b>No resources</b>
-                  <Box padding={{ bottom: "s" }} variant="p" color="inherit">
-                    No resources to display.
-                  </Box>
-                  <Button
-                    onClick={() => {
-                      setPopupState({ state: "Create" });
-                    }}
-                  >
-                    Create resource
-                  </Button>
-                </Box>
-              }
+              visibleSections={createVisibleSections<Item>(CARD_DEFINITION)}
+              empty={<EmptyDisplay setPopupState={setPopupState} />}
               filter={
                 <TextFilter
                   filteringPlaceholder="Find customer"
@@ -175,7 +141,6 @@ const Home: NextPage = () => {
                         Edit
                       </Button>
                       <Button
-                        data-testid="header-btn-delete"
                         disabled={selectedCustomers.length < 1}
                         onClick={async () => {
                           await Promise.all(

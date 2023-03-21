@@ -1,9 +1,8 @@
 import { type NextPage } from "next";
 import { useEffect, useState } from "react";
 
-import Box from "@cloudscape-design/components/box";
 import Button from "@cloudscape-design/components/button";
-import Cards from "@cloudscape-design/components/cards";
+import Cards, { type CardsProps } from "@cloudscape-design/components/cards";
 import Header from "@cloudscape-design/components/header";
 import Pagination from "@cloudscape-design/components/pagination";
 import TextFilter from "@cloudscape-design/components/text-filter";
@@ -15,55 +14,79 @@ import {
   type Product,
 } from "@prisma/client";
 import CustomHead from "~/sections/CustomHead";
+import { EmptyDisplay } from "~/sections/EmptyDisplay";
 import HomeButton from "~/sections/HomeButton";
 import ProductPopup from "~/sections/ProductPopup/CreateAndEdit/index";
 import CustomersDisplay from "~/sections/ProductPopup/view/CustomersDisplay";
 import SubsetDisplay from "~/sections/ProductPopup/view/SubsetDisplay";
 import { SchemaExplorer } from "~/sections/SchemaExplorer";
+import { type Popup } from "~/sections/sharedPopup/state";
 import { api } from "~/utils/api";
+import { createVisibleSections } from "~/utils/cloudscapeCardUtils/createVisibleSections";
 
 const PAGE_SIZE = 8;
 
-interface CreatePopupState {
-  state: "Create";
-}
+type Item = Product & {
+  subsets: GraphQLSubset[];
+  customers: Customer[];
+};
 
-interface EditPopupState {
-  state: "Edit";
-}
-
-interface NonePopupState {
-  state: "None";
-}
-
-type Popup = CreatePopupState | EditPopupState | NonePopupState;
+const CARD_DEFINITION: CardsProps.CardDefinition<Item> = {
+  header: (e) => e.name,
+  sections: [
+    {
+      id: "createdAt",
+      header: "Created At",
+      content: (e) => e.createdAt.toLocaleString(),
+    },
+    {
+      id: "description",
+      header: "Description",
+      content: (e) => e.description,
+    },
+    {
+      id: "customers",
+      header: "Customers",
+      content: (e) => <CustomersDisplay customers={e.customers} />,
+    },
+    {
+      id: "graphQLSubsets",
+      header: "GraphQL Subsets",
+      content: (e) => <SubsetDisplay subsets={e.subsets} />,
+    },
+    {
+      id: "graphQLSchema",
+      header: "GraphQL Schema",
+      content: (e) => (
+        <div className="whitespace-pre-wrap">{e.graphQLSchema}</div>
+      ),
+    },
+    {
+      id: "schemaExplorer",
+      header: "Product Schema Explorer",
+      content: (e) => (
+        <div>
+          <SchemaExplorer schema={e.graphQLSchema} />
+        </div>
+      ),
+    },
+  ],
+};
 
 const Home: NextPage = () => {
   const [filterText, setFilterText] = useState<string | null>(null);
+  const [paginationIndex, setPaginationIndex] = useState(0);
+  const [popupState, setPopupState] = useState<Popup>({ state: "None" });
+  const [selectedProducts, setSelectedProducts] = useState<Item[]>([]);
 
   const products = api.product.getAll.useInfiniteQuery(
     { limit: PAGE_SIZE, filterText },
     { getNextPageParam: (lastPage) => lastPage.nextCursor }
   );
-
-  const [popupState, setPopupState] = useState<Popup>({ state: "None" });
-
   const productsDeleteMutation = api.product.deleteById.useMutation();
 
-  const [selectedProducts, setSelectedProducts] = useState<
-    Array<
-      Product & {
-        subsets: GraphQLSubset[];
-        customers: Customer[];
-      }
-    >
-  >([]);
-
-  const [showChild, setShowChild] = useState(false);
-
-  const [paginationIndex, setPaginationIndex] = useState(0);
-
   // Wait until after client-side hydration to show
+  const [showChild, setShowChild] = useState(false);
   useEffect(() => {
     setShowChild(true);
   }, []);
@@ -84,79 +107,14 @@ const Home: NextPage = () => {
               }
               selectedItems={selectedProducts}
               loading={products.isLoading}
-              cardDefinition={{
-                header: (e) => e.name,
-                sections: [
-                  {
-                    id: "createdAt",
-                    header: "Created At",
-                    content: (e) => e.createdAt.toLocaleString(),
-                  },
-                  {
-                    id: "description",
-                    header: "Description",
-                    content: (e) => e.description,
-                  },
-                  {
-                    id: "customers",
-                    header: "Customers",
-                    content: (e) => (
-                      <CustomersDisplay customers={e.customers} />
-                    ),
-                  },
-                  {
-                    id: "graphQLSubsets",
-                    header: "GraphQL Subsets",
-                    content: (e) => <SubsetDisplay subsets={e.subsets} />,
-                  },
-                  {
-                    id: "graphQLSchema",
-                    header: "GraphQL Schema",
-                    content: (e) => (
-                      <div className="whitespace-pre-wrap">
-                        {e.graphQLSchema}
-                      </div>
-                    ),
-                  },
-                  {
-                    id: "schemaExplorer",
-                    header: "Product Schema Explorer",
-                    content: (e) => (
-                      <div>
-                        <SchemaExplorer schema={e.graphQLSchema} />
-                      </div>
-                    ),
-                  },
-                ],
-              }}
+              cardDefinition={CARD_DEFINITION}
               cardsPerRow={[{ cards: 1 }, { minWidth: 500, cards: 2 }]}
               items={products.data?.pages[paginationIndex]?.items ?? []}
               loadingText="Loading Products..."
               selectionType="multi"
               trackBy="id"
-              visibleSections={[
-                "createdAt",
-                "graphQLSubsets",
-                "graphQLSchema",
-                "description",
-                "customers",
-                "schemaExplorer",
-              ]}
-              empty={
-                <Box textAlign="center" color="inherit">
-                  <b>No resources</b>
-                  <Box padding={{ bottom: "s" }} variant="p" color="inherit">
-                    No resources to display.
-                  </Box>
-                  <Button
-                    onClick={() => {
-                      setPopupState({ state: "Create" });
-                    }}
-                  >
-                    Create resource
-                  </Button>
-                </Box>
-              }
+              visibleSections={createVisibleSections<Item>(CARD_DEFINITION)}
+              empty={<EmptyDisplay setPopupState={setPopupState} />}
               filter={
                 <TextFilter
                   filteringPlaceholder="Find product"
@@ -232,9 +190,9 @@ const Home: NextPage = () => {
                 <Pagination
                   currentPageIndex={paginationIndex + 1}
                   pagesCount={
-                    products.hasNextPage
+                    products.hasNextPage && products.data
                       ? products.data?.pages.length + 1
-                      : products.data?.pages.length
+                      : products.data?.pages.length || 0
                   }
                   onNextPageClick={async () => {
                     await products.fetchNextPage();
