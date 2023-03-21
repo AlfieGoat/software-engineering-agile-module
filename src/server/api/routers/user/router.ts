@@ -15,5 +15,7 @@ export const userRouter = createTRPCRouter({
         where: { id: ctx.session.user.id },
         data: { role: input.newRole },
       });
+
+      return input.newRole;
     }),
 });
