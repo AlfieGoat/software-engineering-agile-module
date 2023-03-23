@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { mergeSchemas } from "./mergeSchemas";
-import { updateProduct } from "./updateProduct";
+import updateProduct from "./updateProduct";
 
 const DEFAULT_PAGE_SIZE = 50;
 const MAX_PAGE_SIZE = 100;
@@ -38,6 +38,12 @@ export const productRouter = createTRPCRouter({
           },
         },
       });
+
+      if (graphQLSubsets.length === 0)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "GraphQLSubset IDs don't exist",
+        });
 
       const mergedSchemas = mergeSchemas(graphQLSubsets);
       const mergedSchemasSdl = printWithComments(mergedSchemas) as string;
@@ -110,7 +116,7 @@ export const productRouter = createTRPCRouter({
   updateById: protectedProcedure
     .input(UpdateProductInputSchema)
     .mutation(async ({ ctx, input }) => {
-      return await updateProduct(input, ctx.prisma);
+      return await updateProduct.updateProduct(input, ctx.prisma);
     }),
 
   deleteById: protectedProcedure

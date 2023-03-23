@@ -1,5 +1,5 @@
-import { buildSchema } from "graphql";
-import { useState } from "react";
+import { buildSchema, type GraphQLSchema } from "graphql";
+import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
 import GraphiQLExplorer from "./Explorer";
 
@@ -13,22 +13,30 @@ export const SchemaExplorer = (props: {
   );
 
   const [query, setQuery] = useState("{}");
-  if (
-    !props.schema ||
-    sourceGraphQLSchema.isLoading ||
-    !sourceGraphQLSchema.data
-  )
-    return <></>;
+
+  const [schema, setSchema] = useState<GraphQLSchema | null>(null);
+
+  useEffect(() => {
+    if (props.schema) {
+      setSchema(buildSchema(props.schema));
+      return;
+    }
+    if (sourceGraphQLSchema.data) {
+      setSchema(buildSchema(sourceGraphQLSchema.data.graphQLSchema));
+      return;
+    }
+  }, [sourceGraphQLSchema.data, props.schema]);
+
+  if (!schema) return <></>;
 
   return (
     <GraphiQLExplorer
       query={query}
       showAttribution={false}
       explorerIsOpen={true}
-      schema={buildSchema(
-        props.schema ? props.schema : sourceGraphQLSchema.data.graphQLSchema
-      )}
+      schema={schema}
       onEdit={(query: string) => {
+        console.log(query);
         setQuery(query);
         if (props.onEdit) props.onEdit(query);
       }}

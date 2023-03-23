@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedAdminProcedure } from "~/server/api/trpc";
-import { updateProduct } from "../product/updateProduct";
+import updateProduct from "../product/updateProduct";
 import { validateAndParseGraphQLSchema } from "./validateAndParseGraphQLSchema";
 
 import { parse, print } from "graphql";
@@ -125,7 +125,7 @@ export const graphQLSubsetRouter = createTRPCRouter({
 
         await Promise.all(
           products.map((product) =>
-            updateProduct(
+            updateProduct.updateProduct(
               {
                 editedProduct: {
                   graphQLSubsets: product.subsets.map((subset) => ({

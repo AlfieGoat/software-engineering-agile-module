@@ -1,10 +1,11 @@
 import { printWithComments } from "@graphql-toolkit/schema-merging";
 import { type Prisma, type PrismaClient } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 import { type z } from "zod";
 import { mergeSchemas } from "./mergeSchemas";
 import { type UpdateProductInputSchema } from "./router";
 
-export const updateProduct = async (
+const updateProduct = async (
   productUpdateData: z.TypeOf<typeof UpdateProductInputSchema>,
   tx: Omit<
     PrismaClient<
@@ -25,6 +26,12 @@ export const updateProduct = async (
     },
   });
 
+  if (graphQLSubsets.length === 0)
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Found no graphQLSubsets with the provided ids",
+    });
+
   const mergedSchemas = mergeSchemas(graphQLSubsets);
   const mergedSchemasSdl = printWithComments(mergedSchemas) as string;
 
@@ -38,3 +45,7 @@ export const updateProduct = async (
     },
   });
 };
+
+const def = {updateProduct};
+
+export default def;

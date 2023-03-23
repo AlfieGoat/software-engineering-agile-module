@@ -27,17 +27,28 @@ export const getFieldAllowListInfo = (
     fieldName: "",
   };
 
-  const reducer = (state: Field, currentField: FieldPathsNode, currentIndex: number, array: FieldPathsNode[]): Field => {
-    if(currentField.kind === "InlineFragment" && array.length === currentIndex + 1){
+  const reducer = (
+    state: Field,
+    currentField: FieldPathsNode,
+    currentIndex: number,
+    array: FieldPathsNode[]
+  ): Field => {
+    if (
+      currentField.kind === "InlineFragment" &&
+      array.length === currentIndex + 1
+    ) {
       const currentFieldNamedType = currentField.typeCondition;
-      if(!currentFieldNamedType) throw new Error("Expected current InlineFragment to have a named type.");
+      if (!currentFieldNamedType)
+        throw new Error(
+          "Expected current InlineFragment to have a named type."
+        );
 
       return {
         parentType: state.fieldType,
         fieldType: currentField.typeCondition.name.value,
         fieldName: "",
-        type: "field"
-      }
+        type: "field",
+      };
     }
 
     const pathType = schema.definitions.find((definition) => {
@@ -77,7 +88,17 @@ export const getFieldAllowListInfo = (
         throw new Error("Unexpected OperationDefinition");
     }
 
-    if (!nextPathType) throw new Error(`nextPathType is falsy!`);
+    if (!nextPathType) {
+      if (currentField.kind === "Field") {
+        throw new Error(
+          `Could not find nextPathType for field: ${currentField.name.value}`
+        );
+      } else if (currentField.kind === "InlineFragment") {
+        throw new Error(`Could not find nextPathType for InlineFragment`);
+      } else {
+        throw new Error("Failed to find nextPathType");
+      }
+    }
 
     const resolvedType = resolveRootType(nextPathType);
 
