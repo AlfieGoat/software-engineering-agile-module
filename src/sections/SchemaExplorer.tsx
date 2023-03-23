@@ -36,7 +36,6 @@ export const SchemaExplorer = (props: {
       explorerIsOpen={true}
       schema={schema}
       onEdit={(query: string) => {
-        console.log(query);
         setQuery(query);
         if (props.onEdit) props.onEdit(query);
       }}

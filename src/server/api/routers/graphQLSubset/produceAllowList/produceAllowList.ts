@@ -45,6 +45,5 @@ export function produceAllowList(
     }
   });
 
-  // console.log(JSON.stringify({ fieldAllowList, argumentAllowList }, null, 4));
   return [fieldAllowList, argumentAllowList];
 }

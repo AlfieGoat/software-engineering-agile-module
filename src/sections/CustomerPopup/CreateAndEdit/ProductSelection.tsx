@@ -46,8 +46,6 @@ export const ProductSelection = () => {
       />
       <RadioGroup
         onChange={({ detail }) => {
-          console.log(formData, detail.value);
-
           setFormData(
             produce((draft) => {
               draft.productId = detail.value;

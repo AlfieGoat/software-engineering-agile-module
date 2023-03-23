@@ -196,8 +196,6 @@ export const graphQLSubsetRouter = createTRPCRouter({
 
       collectLeafPaths(parsedQuery, leafPaths);
 
-      console.log(JSON.stringify({ leafPaths }));
-
       // 2. Create the allowList
       const [fieldAllowList, argumentAllowList] = produceAllowList(
         parsedSourceGraphQLSchema,
@@ -210,7 +208,6 @@ export const graphQLSubsetRouter = createTRPCRouter({
         fieldAllowList,
         argumentAllowList
       );
-      // console.log(print(prunedSchema));
       return print(prunedSchema);
     }),
 });
