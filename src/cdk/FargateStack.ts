@@ -1,6 +1,6 @@
 import { Stack, type StackProps } from "aws-cdk-lib";
 import { type ICertificate } from "aws-cdk-lib/aws-certificatemanager";
-import { SubnetType, Vpc } from "aws-cdk-lib/aws-ec2";
+import { type IVpc } from "aws-cdk-lib/aws-ec2";
 import { DockerImageAsset } from "aws-cdk-lib/aws-ecr-assets";
 import {
   AwsLogDriver,
@@ -18,6 +18,8 @@ import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 import { type Construct } from "constructs";
 
 interface FargateStackProps extends StackProps {
+  vpc: IVpc;
+
   dockerImageDirectory: string;
   dockerFile: string;
 
@@ -46,19 +48,8 @@ export class FargateStack extends Stack {
       file: props.dockerFile,
     });
 
-    const vpc = new Vpc(this, `${id}-VPC`, {
-      cidr: "10.0.0.0/20",
-      maxAzs: 3,
-      subnetConfiguration: [
-        {
-          subnetType: SubnetType.PUBLIC,
-          name: "PublicSubnet",
-        },
-      ],
-    });
-
     const cluster = new Cluster(this, `${id}-Cluster`, {
-      vpc: vpc,
+      vpc: props.vpc,
     });
 
     const taskDefinition = new TaskDefinition(this, `${id}-TaskDefinition`, {

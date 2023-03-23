@@ -3,6 +3,7 @@ import { type Construct } from "constructs";
 import { join } from "path";
 import { FargateStack } from "./FargateStack";
 import { HostedZoneStack } from "./HostedZoneStack";
+import { VpcStack } from "./VpcStack";
 
 export class PipelineStage extends Stage {
   constructor(scope: Construct, id: string, props: StageProps) {
@@ -14,7 +15,11 @@ export class PipelineStage extends Stage {
       domainName,
     });
 
+    const { vpc } = new VpcStack(this, "VpcStack", {});
+
     new FargateStack(this, "ProductBuilder", {
+      vpc,
+
       dockerImageDirectory: join(__dirname, "../../"),
       dockerFile: join("./Dockerfile"),
 
