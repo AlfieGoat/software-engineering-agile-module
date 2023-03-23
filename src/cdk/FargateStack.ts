@@ -20,6 +20,8 @@ import { type Construct } from "constructs";
 interface FargateStackProps extends StackProps {
   vpc: IVpc;
 
+  databaseUrl: string;
+
   dockerImageDirectory: string;
   dockerFile: string;
 
@@ -72,10 +74,7 @@ export class FargateStack extends Stack {
       image: ContainerImage.fromDockerImageAsset(dockerImage),
       portMappings: [{ containerPort: 3000, hostPort: 3000 }],
       environment: {
-        DATABASE_URL: secretConfig
-          .secretValueFromJson("DATABASE_URL")
-          .unsafeUnwrap()
-          .toString(),
+        DATABASE_URL: props.databaseUrl,
         NEXTAUTH_URL: secretConfig
           .secretValueFromJson("NEXTAUTH_URL")
           .unsafeUnwrap()
@@ -98,19 +97,6 @@ export class FargateStack extends Stack {
         streamPrefix: `${id}-FargateContainer`,
         mode: AwsLogDriverMode.NON_BLOCKING,
       }),
-    });
-
-    taskDefinition.addContainer(`${id}-PostgresContainer`, {
-      image: ContainerImage.fromRegistry(
-        "public.ecr.aws/ubuntu/postgres:latest"
-      ),
-      portMappings: [{ containerPort: 5432, hostPort: 5432 }],
-      environment: {
-        POSTGRES_PASSWORD: secretConfig
-          .secretValueFromJson("POSTGRES_PASSWORD")
-          .unsafeUnwrap()
-          .toString(),
-      },
     });
 
     const fargateService = new ApplicationLoadBalancedFargateService(
