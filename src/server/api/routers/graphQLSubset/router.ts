@@ -70,9 +70,9 @@ export const graphQLSubsetRouter = createTRPCRouter({
           ? {
               where: {
                 OR: [
-                  { name: { contains: filterText, mode: "insensitive" } },
+                  { name: { contains: filterText } },
                   {
-                    description: { contains: filterText, mode: "insensitive" },
+                    description: { contains: filterText },
                   },
                 ],
               },

@@ -21,9 +21,11 @@ export const sourceGraphQLSchemaRouter = createTRPCRouter({
           orderBy: { createdAt: "desc" },
         });
 
-        await tx.sourceGraphQLSchema.delete({
-          where: { id: oldGraphQLSchema?.id },
-        });
+        if (oldGraphQLSchema) {
+          await tx.sourceGraphQLSchema.delete({
+            where: { id: oldGraphQLSchema?.id },
+          });
+        }
 
         const sourceGraphQLSchema = await tx.sourceGraphQLSchema.create({
           data: {
@@ -60,6 +62,8 @@ export const sourceGraphQLSchemaRouter = createTRPCRouter({
 
       const allGraphQLSubsets = await ctx.prisma.graphQLSubset.findMany({});
 
+      if (allGraphQLSubsets.length === 0) return "No GraphQL Subsets have been defined.";
+
       const allGraphQLSubsetsMerged = mergeSchemas(allGraphQLSubsets);
       const allGraphQLSubsetsMergedSdl = printWithComments(
         allGraphQLSubsetsMerged
@@ -70,7 +74,9 @@ export const sourceGraphQLSchemaRouter = createTRPCRouter({
         allGraphQLSubsetsMergedSdl
       );
 
-      return schemaDiff;
+      return schemaDiff?.breakingChanges.map(
+        (change) => `+++${change.description.split(" ")[0]!} \n`
+      );
     }
   ),
 });

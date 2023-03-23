@@ -97,9 +97,7 @@ const CompareLatestSourceGraphQLSchemaWithSubsets = () => {
       )}
       {!!compareLatestSourceGraphQLSchemaWithSubsets.data ? (
         <div className="whitespace-pre">
-          {compareLatestSourceGraphQLSchemaWithSubsets.data.breakingChanges.map(
-            (change) => `+++${change.description.split(" ")[0]!} \n`
-          )}
+          {compareLatestSourceGraphQLSchemaWithSubsets.data}
         </div>
       ) : (
         "No changes!"

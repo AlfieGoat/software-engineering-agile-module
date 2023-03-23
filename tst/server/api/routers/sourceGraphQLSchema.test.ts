@@ -90,9 +90,45 @@ describe("SourceGraphQLSchema Router", () => {
         mockCtx
       ).sourceGraphQLSchema.compareLatestSourceGraphQLSchemaWithSubsets();
 
-      expect(result?.breakingChanges).toEqual([
-        { description: "Query.world was removed.", type: "FIELD_REMOVED" },
-      ]);
+      expect(result).toMatchInlineSnapshot(`
+        [
+          "+++Query.world 
+        ",
+        ]
+      `);
+
+      expect(mockCtx.prisma.sourceGraphQLSchema.findFirst).toHaveBeenCalledWith(
+        {
+          orderBy: { createdAt: "desc" },
+        }
+      );
+      expect(mockCtx.prisma.graphQLSubset.findMany).toHaveBeenCalledWith({});
+    });
+
+    test("should return appropriate string when no GraphQL subsets defined", async () => {
+      const latestSourceGraphQLSchema = {
+        id: "1234567890",
+        graphQLSchema: `type Query {
+            hello(id: ID!): String
+            world(id: ID!): String
+          }`,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockCtx.prisma.sourceGraphQLSchema.findFirst.mockResolvedValue(
+        latestSourceGraphQLSchema
+      );
+
+      mockCtx.prisma.graphQLSubset.findMany.mockResolvedValue([]);
+
+      const result = await trpcRequest(
+        mockCtx
+      ).sourceGraphQLSchema.compareLatestSourceGraphQLSchemaWithSubsets();
+
+      expect(result).toMatchInlineSnapshot(
+        `"No GraphQL Subsets have been defined."`
+      );
 
       expect(mockCtx.prisma.sourceGraphQLSchema.findFirst).toHaveBeenCalledWith(
         {
