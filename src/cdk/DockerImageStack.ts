@@ -25,6 +25,7 @@ export class DockerImageStack extends Stack {
         ".next",
         ".git",
         "README.md",
+        "src/cdk"
       ],
       file: props.dockerFile,
     });

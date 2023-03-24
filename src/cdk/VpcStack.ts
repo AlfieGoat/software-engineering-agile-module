@@ -14,15 +14,7 @@ export class VpcStack extends Stack {
       subnetConfiguration: [
         {
           subnetType: SubnetType.PUBLIC,
-          name: "PublicSubnet1",
-        },
-        {
-          subnetType: SubnetType.PUBLIC,
-          name: "PublicSubnet2",
-        },
-        {
-          subnetType: SubnetType.PUBLIC,
-          name: "PublicSubnet3",
+          name: "PublicSubnet",
         },
         {
           name: 'Database',
