@@ -43,16 +43,18 @@ describe("Customer Router", () => {
     });
 
     test("should throw an error when input is invalid", async () => {
-        const input = {
-          name: "Bad",
-          description: "",
-          productId: "1",
-        };
-      
-        await expect(trpcRequest(mockCtx).customer.create(input)).rejects.toThrow();
-      
-        expect(mockCtx.prisma.customer.create).not.toHaveBeenCalled();
-      });
+      const input = {
+        name: "Bad",
+        description: "",
+        productId: "1",
+      };
+
+      await expect(
+        trpcRequest(mockCtx).customer.create(input)
+      ).rejects.toThrow();
+
+      expect(mockCtx.prisma.customer.create).not.toHaveBeenCalled();
+    });
   });
 
   describe("getById", () => {
@@ -70,7 +72,9 @@ describe("Customer Router", () => {
 
       mockCtx.prisma.customer.findUnique.mockResolvedValue(customer);
 
-      const result = await trpcRequest(mockCtx).customer.getById({ customerId });
+      const result = await trpcRequest(mockCtx).customer.getById({
+        customerId,
+      });
 
       expect(result).toEqual(customer);
       expect(mockCtx.prisma.customer.findUnique).toHaveBeenCalledWith({
@@ -83,7 +87,9 @@ describe("Customer Router", () => {
 
       mockCtx.prisma.customer.findUnique.mockResolvedValue(null);
 
-      const result = await trpcRequest(mockCtx).customer.getById({ customerId });
+      const result = await trpcRequest(mockCtx).customer.getById({
+        customerId,
+      });
 
       expect(result).toBeNull();
       expect(mockCtx.prisma.customer.findUnique).toHaveBeenCalledWith({
@@ -135,8 +141,8 @@ describe("Customer Router", () => {
         include: { product: true },
         where: {
           OR: [
-            { name: { contains: filterText, mode: "insensitive" } },
-            { description: { contains: filterText, mode: "insensitive" } },
+            { name: { contains: filterText } },
+            { description: { contains: filterText } },
           ],
         },
       });
@@ -165,8 +171,8 @@ describe("Customer Router", () => {
         include: { product: true },
         where: {
           OR: [
-            { name: { contains: filterText, mode: "insensitive" } },
-            { description: { contains: filterText, mode: "insensitive" } },
+            { name: { contains: filterText } },
+            { description: { contains: filterText } },
           ],
         },
       });
@@ -242,5 +248,3 @@ describe("Customer Router", () => {
     });
   });
 });
-
-

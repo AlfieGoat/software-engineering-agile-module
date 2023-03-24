@@ -1,7 +1,7 @@
 import { Stack, type StackProps } from "aws-cdk-lib";
 import { type ICertificate } from "aws-cdk-lib/aws-certificatemanager";
 import { type IVpc } from "aws-cdk-lib/aws-ec2";
-import { DockerImageAsset } from "aws-cdk-lib/aws-ecr-assets";
+import { type DockerImageAsset } from "aws-cdk-lib/aws-ecr-assets";
 import {
   AwsLogDriver,
   AwsLogDriverMode,
@@ -22,8 +22,7 @@ interface FargateStackProps extends StackProps {
 
   databaseUrl: string;
 
-  dockerImageDirectory: string;
-  dockerFile: string;
+  dockerImage: DockerImageAsset;
 
   certificate: ICertificate;
   domainName: string;
@@ -33,22 +32,6 @@ interface FargateStackProps extends StackProps {
 export class FargateStack extends Stack {
   constructor(scope: Construct, id: string, props: FargateStackProps) {
     super(scope, id, props);
-
-    const dockerImage = new DockerImageAsset(this, `${id}-BackDockerImage`, {
-      directory: props.dockerImageDirectory,
-      exclude: [
-        "cdk.out",
-        ".env",
-        "Dockerfile",
-        ".dockerignore",
-        "node_modules",
-        "npm-debug.log",
-        ".next",
-        ".git",
-        "README.md",
-      ],
-      file: props.dockerFile,
-    });
 
     const cluster = new Cluster(this, `${id}-Cluster`, {
       vpc: props.vpc,
@@ -71,7 +54,7 @@ export class FargateStack extends Stack {
     );
 
     taskDefinition.addContainer(`${id}-FargateContainer`, {
-      image: ContainerImage.fromDockerImageAsset(dockerImage),
+      image: ContainerImage.fromDockerImageAsset(props.dockerImage),
       portMappings: [{ containerPort: 3000, hostPort: 3000 }],
       environment: {
         DATABASE_URL: props.databaseUrl,

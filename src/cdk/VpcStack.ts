@@ -10,15 +10,27 @@ export class VpcStack extends Stack {
 
     this.vpc = new Vpc(this, `${id}-VPC`, {
       cidr: "10.0.0.0/20",
-      maxAzs: 99, // To use "all AZs" available to your account, use a high number (such as 99).
+      maxAzs: 5, // To use "all AZs" available to your account, use a high number (such as 99).
       subnetConfiguration: [
         {
           subnetType: SubnetType.PUBLIC,
-          name: "PublicSubnet",
+          name: "PublicSubnet1",
+        },
+        {
+          subnetType: SubnetType.PUBLIC,
+          name: "PublicSubnet2",
+        },
+        {
+          subnetType: SubnetType.PUBLIC,
+          name: "PublicSubnet3",
         },
         {
           name: 'Database',
           subnetType: SubnetType.PRIVATE_ISOLATED,
+        },
+        {
+          name: 'DBMigration',
+          subnetType: SubnetType.PRIVATE_WITH_NAT
         }
       ],
     });

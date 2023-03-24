@@ -2,6 +2,7 @@ import { Stage, type StageProps } from "aws-cdk-lib";
 import { type Construct } from "constructs";
 import { join } from "path";
 import { DatabaseStack } from "./DatabaseStack";
+import { DockerImageStack } from "./DockerImageStack";
 import { FargateStack } from "./FargateStack";
 import { HostedZoneStack } from "./HostedZoneStack";
 import { VpcStack } from "./VpcStack";
@@ -18,24 +19,30 @@ export class PipelineStage extends Stage {
 
     const { vpc } = new VpcStack(this, "VpcStack", {});
 
+    const dockerImageStack = new DockerImageStack(this, "DockerImage", {
+      dockerImageDirectory: join(__dirname, "../../"),
+      dockerFile: join("./Dockerfile"),
+    });
+
     const databaseStack = new DatabaseStack(this, "DatabaseStack", {
-      vpc
+      vpc,
+      dockerImage: dockerImageStack.dockerImage
     });
 
     const databaseUrl = databaseStack.getDatabaseUrl();
 
-
-    new FargateStack(this, "ProductBuilder", {
+    const fargateStack = new FargateStack(this, "ProductBuilder", {
       vpc,
 
       databaseUrl,
 
-      dockerImageDirectory: join(__dirname, "../../"),
-      dockerFile: join("./Dockerfile"),
+      dockerImage: dockerImageStack.dockerImage,
 
       certificate: hostedZoneStack.certificate,
       hostedZone: hostedZoneStack.hostedZone,
       domainName,
     });
+
+    fargateStack.addDependency(databaseStack);
   }
 }

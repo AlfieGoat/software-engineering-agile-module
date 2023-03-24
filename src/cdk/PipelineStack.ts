@@ -24,10 +24,7 @@ export class PipelineStack extends Stack {
         env: {
           SKIP_ENV_VALIDATION: "1",
         },
-        commands: [
-          "npm install",
-          "npm run synth",
-        ],
+        commands: ["npm install", "npm run synth"],
       }),
     });
 

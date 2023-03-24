@@ -269,9 +269,9 @@ describe("Product Router", () => {
         include: { subsets: true, customers: true },
         where: {
           OR: [
-            { name: { contains: input.filterText, mode: "insensitive" } },
+            { name: { contains: input.filterText } },
             {
-              description: { contains: input.filterText, mode: "insensitive" },
+              description: { contains: input.filterText },
             },
           ],
         },
@@ -327,9 +327,9 @@ describe("Product Router", () => {
         include: { subsets: true, customers: true },
         where: {
           OR: [
-            { name: { contains: input.filterText, mode: "insensitive" } },
+            { name: { contains: input.filterText } },
             {
-              description: { contains: input.filterText, mode: "insensitive" },
+              description: { contains: input.filterText },
             },
           ],
         },
