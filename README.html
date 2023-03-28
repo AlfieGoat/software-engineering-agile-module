@@ -266,7 +266,7 @@ pre[data-line] .line-highlight[data-end]:after {
 <p>The GraphQL Product Builder allows for bespoke GraphQL schemas to be generated.</p>
 <h2 class="mume-header" id="background">Background</h2>
 
-<h3 class="mume-header" id="graphql">GraphQL</h3>
+<h3 class="mume-header" id="what-is-graphql">What is GraphQL</h3>
 
 <p>GraphQL is a query language built on top of a well defined schema. The schema defines all of the queries, mutations and subscriptions a client can make to a server. The schema is the contract that binds the client and the server. With GraphQL you specify the exact data you want from the server and you get the data back in exactly that format. This reduces over-fetching and reduces the amount of data that needs to be transferred over the network.</p>
 <p>Here&apos;s an example query for a vehicle GraphQL API:</p>
@@ -300,16 +300,16 @@ pre[data-line] .line-highlight[data-end]:after {
 </pre><h3 class="mume-header" id="monetizing-your-graphql-api">Monetizing your GraphQL API</h3>
 
 <p>Monetizing APIs is not a new concept, but monetizing GraphQL APIs is a more novel concept.</p>
-<p>Imagine you have a GraphQL API within your organisation and you want to monetize your API by enabling third parties to have enterprise access your API. How would you do this? Well, you can setup a GraphQL endpoint, enter a contract with the 3rd party, exchange money and provide them with access to your API.</p>
+<p>Imagine you have a GraphQL API within your organization and you want to monetize your API by enabling third parties to have enterprise access to your API. How would you do this? Well, you can setup a GraphQL endpoint, enter a contract with the 3rd party, exchange money and provide them with access to your API.</p>
 <p>But there&apos;s one main problem with this - By exposing your whole GraphQL Endpoint, there is only one single GraphQL schema that is being given to every customer.</p>
 <p>Think about the following business requirements:</p>
 <ul>
 <li>As an API provider, I want to expose a subset of data to customers who are paying less.</li>
 </ul>
 <p>Exposing a subset of data isn&apos;t possible with a regular GraphQL endpoint. So how would you fulfill this business requirement? A GraphQL Product Builder.</p>
-<h2 class="mume-header" id="what-is-the-graphql-product-builder-with-a-concrete-example">What is the GraphQL Product Builder with a concrete example</h2>
+<h2 class="mume-header" id="what-is-the-graphql-product-builder-a-concrete-example">What is the GraphQL Product Builder (a concrete example)</h2>
 
-<p>Imagine you work at a Twitter and you have a GraphQL API that provides information about tweets and Twitter users . The schema for the GraphQL API that provides the data could look like this:</p>
+<p>Imagine you work at a Twitter and you have a GraphQL API that provides information about tweets and Twitter users. The schema for the GraphQL API that provides the data could look like this:</p>
 <pre data-role="codeBlock" data-info="graphql" class="language-graphql"><span class="token keyword keyword-type">type</span> <span class="token class-name">Tweet</span> <span class="token punctuation">{</span>
     <span class="token attr-name">id</span><span class="token punctuation">:</span> <span class="token scalar">ID</span><span class="token operator">!</span>
     <span class="token attr-name">body</span><span class="token punctuation">:</span> <span class="token scalar">String</span>
@@ -347,23 +347,132 @@ pre[data-line] .line-highlight[data-end]:after {
 <li>Software Development Engineers (SDE) who are familiar with the underlying Twitter GraphQL schema.</li>
 <li>Sales Representatives (SR) who are selling the Twitter API to customers.</li>
 </ul>
-<p>The terms of a new sale have been negotiated and the sale has been made, so access to the API needs to be provided to the customer.</p>
-<p>The negotiations have stated that the customer are allowed to access <strong>Tweet</strong> information, but <strong>not data about User</strong> (additional monetary compensation would be required for a customer to onboard with User data).</p>
-<p>Based on this information we can onboard the customer onto the GraphQL API. So how do we do this?</p>
+<p>The terms of a new sale have been negotiated and the sale has just been made, so access to the API needs to be provided to the customer.</p>
+<p>The negotiations have stated that the customer is allowed to access <strong>Tweet</strong> information including <strong>Tweet Statistics</strong>, but <strong>not data about Users</strong> (additional monetary compensation would be required for a customer to onboard with User data).</p>
+<p>Based on this information we can onboard the customer onto the GraphQL API. But how do we do this?</p>
 <h3 class="mume-header" id="step-1-add-the-schema-to-the-graphql-product-builder">Step 1: Add the schema to the GraphQL Product Builder</h3>
 
 <p>Let&apos;s add the customer to the database.</p>
-<p>Navigate to <a href="https://graphqlproductbuilder.co.uk/sourceGraphQLSchema">https://graphqlproductbuilder.co.uk/sourceGraphQLSchema</a> and we can add the exhaustive schema for our GraphQL API.</p>
+<p>Navigate to <a href="https://graphqlproductbuilder.co.uk/sourceGraphQLSchema">https://graphqlproductbuilder.co.uk/sourceGraphQLSchema</a> and we can add the exhaustive schema for our GraphQL API. This</p>
 <p><img src="./documentation/SourceGraphQLSchemaWithSchema.png" alt="The Source GraphQL Schema page with the schema filled in"></p>
-<h3 class="mume-header" id="step-2-create-the-graphql-subset">Step 2: Create the GraphQL Subset</h3>
+<h3 class="mume-header" id="step-2-create-the-graphql-subsets">Step 2: Create the GraphQL Subsets</h3>
 
-<p>We need to create a GraphQL Subset. What is a GraphQL Subset? These subsets are what make up the product. Multiple subsets can be composed together to form a product</p>
-<ol>
+<p>We need to create a GraphQL Subset. What is a GraphQL Subset? These subsets are what make up the final product. Each subset is a subset of the complete GraphQL schema. These subsets can be composed together to form a product, where the subset schemas are merged into a single schema and stored in the product.</p>
+<ul>
 <li>Navigate to <a href="https://graphqlproductbuilder.co.uk/graphQLSubsets">https://graphqlproductbuilder.co.uk/graphQLSubsets</a>.</li>
-<li>Create a new GraphQLSubset for the base tweet information</li>
-<li>Use the Query explorer to define the data that you want in the GraphQL Subset</li>
+<li>Create a new GraphQLSubset for the base tweet information
+<ul>
+<li>Add a name for the GraphQL Subset</li>
+<li>Add a description for the GraphQL Subset</li>
+<li>Use the Query explorer to define the data that you want in the GraphQL Subset. This explorer visualizes the schema and you can click through the drop downs to select the kinds of queries you want the customer to be able to execute. This will generate a subset schema which you can review.</li>
+<li>Press Create!</li>
+</ul>
+</li>
+<li>Repeat what you just did, but for the tweet statistics.</li>
+</ul>
+<p><strong>Creation of the Base Tweet GraphQL Subset</strong><br>
+<img src="./documentation/BaseTweetGraphQLSubset.png" alt="Creation of the Base Tweet GraphQL Subset"></p>
+<p><strong>Final Page showing the GraphQL Subsets</strong></p>
+<p>I&apos;ve added some additional subsets as an extra example.</p>
+<p><img src="./documentation/GraphQLSubsetPageWithFourSubsets.png" alt="Final GraphQL Subsets Page"></p>
+<h3 class="mume-header" id="step-3-creating-the-graphql-product">Step 3: Creating the GraphQL Product</h3>
+
+<p>Now we need to create the actual product that comprises of the two GraphQL Subsets.</p>
+<ul>
+<li>Navigate to <a href="https://graphqlproductbuilder.co.uk/products">https://graphqlproductbuilder.co.uk/products</a></li>
+<li>Create a new Product
+<ul>
+<li>Call it the Tweet and Statistics Product</li>
+<li>Add a description</li>
+<li>Select the correct GraphQL subsets</li>
+<li>Press Create!</li>
+</ul>
+</li>
+</ul>
+<p><strong>Creation of The Tweet and Statistics Product</strong></p>
+<p><img src="./documentation/TweetAndStatisticsProduct.png" alt="The Tweet and Statistics Product"></p>
+<p><strong>I&apos;ve added an additional product as an extra example</strong></p>
+<p><img src="./documentation/GraphQLProductsPage.png" alt="Final GraphQL Products Page"></p>
+<h3 class="mume-header" id="step-4-create-the-customer">Step 4: Create the customer</h3>
+
+<ul>
+<li>Navigate to <a href="https://graphqlproductbuilder.co.uk/customers">https://graphqlproductbuilder.co.uk/customers</a></li>
+<li>Create the customer
+<ul>
+<li>Add the customer name</li>
+<li>Add the customer description</li>
+<li>Select the correct GraphQL product to associate with the customer</li>
+<li>Press Create!</li>
+</ul>
+</li>
+</ul>
+<p><strong>Creation of the customer</strong></p>
+<p><img src="./documentation/CreateGoogleCustomer.png" alt="Creation of the customer"></p>
+<p><strong>Final GraphQL customer page</strong></p>
+<p><img src="./documentation/GraphQLProductsPage.png" alt="Final GraphQL Customers Page"></p>
+<h3 class="mume-header" id="what-happens-now">What happens now?</h3>
+
+<p>You have now uploaded the source of truth schema, you&apos;ve created the underlying GraphQL Subsets, you&apos;ve created the Product which is made up of the GraphQL Subsets and you&apos;ve created the Customer along with the product you want them to be able to access.</p>
+<p>This application manages the source schema, the GraphQL Subsets, the GraphQL Products and the underlying Customers, but it currently doesn&apos;t integrate with any GraphQL Gateway. The next step would be to include the customer&apos;s API key and associate it with the customer entity in the database, then the GraphQL Gateway could do a lookup from the API key to the correct GraphQL Schema for that customer.</p>
+<h2 class="mume-header" id="next-steps">Next steps</h2>
+
+<h3 class="mume-header" id="dynamic-schema-per-customer">Dynamic schema per customer</h3>
+
+<p>As mentioned above, this application needs integrating with a GraphQL Gateway to allow for a dynamic schema per customer.</p>
+<h3 class="mume-header" id="locking-down-the-application">Locking down the application</h3>
+
+<p>If you want to deploy this application for your GraphQL Gateway, you will need to lock this application down to only those who need it. You can do this by:</p>
+<ul>
+<li>Creating a NextJS middleware which checks that the requesting user is logged in and is allowlisted to access the website. This is a front end check.</li>
+<li>Creating and using a new tRPC procedure which checks if the user is logged in and allowlisted to access the queries and mutations specified.</li>
+<li>Remove the demonstrative user toggle switch</li>
+</ul>
+<h3 class="mume-header" id="automatic-schema-ingestion">Automatic schema ingestion</h3>
+
+<p>Whenever the underlying GraphQL schema changes, we don&apos;t want to have to manually update it. A new feature would be to allow for automatic schema ingestion. This would ensure that the GraphQL Product Builder always has the latest changes and there&apos;s no manual intervention involved.</p>
+<h3 class="mume-header" id="integration-testing">Integration testing</h3>
+
+<p>Whenever you want to make a change to the GraphQL schema of a subset, I want integration testing to be performed.</p>
+<p>GraphQL Products are made up of many GraphQL Subsets by composing their GraphQL schemas into a single schema. If I make a change to one of the GraphQL subsets, it will cause the GraphQL Products to have a different schema. I want to ensure that the new resulting GraphQL Product schema:</p>
+<ol>
+<li></li>
+<li>Is a valid schema</li>
 </ol>
-<p><img src="./documentation/BaseTweetGraphQLSubset.png" alt="Base Tween GraphQL Subset"></p>
+<h4 class="mume-header" id="statically-check-it-is-a-valid-schema">Statically check it is a valid schema</h4>
+
+<p>This can be done by parsing the schema and checking there are no errors when parsing.</p>
+<h4 class="mume-header" id="statically-check-that-it-contains-no-breaking-changes">Statically check that it contains no breaking changes</h4>
+
+<p>This can be done by running it through the GraphQL schema diffing tool which provides any breaking changes.</p>
+<h4 class="mume-header" id="execute-against-the-schema-to-test-it-is-a-valid-schema">Execute against the schema to test it is a valid schema</h4>
+
+<p>This could work by:</p>
+<ul>
+<li>GraphQL Subset test:
+<ul>
+<li>Each GraphQL subset to have it&apos;s own integration test query.</li>
+<li>The GraphQL Product Builder will call the GraphQL Gateway with the query and a special header that overrides the schema with the schema of the GraphQL Subset.</li>
+<li>The GraphQL Product Builder will receive the response</li>
+<li>The GraphQL Product Builder will check that the response is a 200 and contains no errors.</li>
+<li>The GraphQL Product Builder will check that the response contains data that is of the correct schema type.</li>
+<li>If the GraphQL subset integration checks pass, it will move on to the GraphQL Product tests</li>
+</ul>
+</li>
+<li>GraphQL Product Tests:
+<ul>
+<li>For each GraphQL Product that the edited GraphQL Subset is associated with:
+<ul>
+<li>The GraphQL Product Builder will calculate the new GraphQL schema</li>
+<li>For each GraphLQ Subset of each GraphQL Product for the given edited GraphQL Subset
+<ul>
+<li>For each Graph</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 <h2 class="mume-header" id="whats-next-how-do-i-make-an-app-with-this">What&apos;s next? How do I make an app with this?</h2>
 
 <p>We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.</p>

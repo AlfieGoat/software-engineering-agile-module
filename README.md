@@ -110,13 +110,13 @@ Based on this information we can onboard the customer onto the GraphQL API. But 
 ### Step 1: Add the schema to the GraphQL Product Builder
 Let's add the customer to the database.
 
-Navigate to https://graphqlproductbuilder.co.uk/sourceGraphQLSchema and we can add the exhaustive schema for our GraphQL API. This 
+Navigate to https://graphqlproductbuilder.co.uk/sourceGraphQLSchema and we can add the exhaustive schema for our GraphQL API. This is needed because all of the GraphQL Subsets are based on this *source of truth schema*.
 
 ![The Source GraphQL Schema page with the schema filled in](./documentation/SourceGraphQLSchemaWithSchema.png)
 
 ### Step 2: Create the GraphQL Subsets
 
-We need to create a GraphQL Subset. What is a GraphQL Subset? These subsets are what make up the final product. Each subset is a subset of the complete GraphQL schema. These subsets can be composed together to form a product, where the subset schemas are merged into a single schema and stored in the product.
+We need to create a GraphQL Subset. But why? What is a GraphQL Subset? These subsets are what make up the final product. Each subset is a chunk of the complete GraphQL schema. These subsets can be composed together to form a product, where the subset schemas are merged into a single schema and stored in the product. GraphQL Subsets can overlap.
 
 - Navigate to https://graphqlproductbuilder.co.uk/graphQLSubsets.
 - Create a new GraphQLSubset for the base tweet information
@@ -124,16 +124,16 @@ We need to create a GraphQL Subset. What is a GraphQL Subset? These subsets are 
   - Add a description for the GraphQL Subset
   - Use the Query explorer to define the data that you want in the GraphQL Subset. This explorer visualizes the schema and you can click through the drop downs to select the kinds of queries you want the customer to be able to execute. This will generate a subset schema which you can review.
   - Press Create!
-- Repeat what you just did, but for the tweet statistics
-- Create one last GraphQL Subset for user information
+- Repeat what you just did, but for the tweet statistics.
 
 **Creation of the Base Tweet GraphQL Subset**
 ![Creation of the Base Tweet GraphQL Subset](./documentation/BaseTweetGraphQLSubset.png)
 
-I added two additional GraphQL Subsets to illustrate how you don't have to use all of the GraphQL subsets when building a product.
-
 **Final Page showing the GraphQL Subsets**
-![Final Page showing the GraphQL Subsets](./documentation/GraphQLSubsetPageWithFourSubsets.png)
+
+I've added some additional subsets to show some more examples.
+
+![Final GraphQL Subsets Page](./documentation/GraphQLSubsetPageWithFourSubsets.png)
 
 ### Step 3: Creating the GraphQL Product
 
@@ -146,31 +146,147 @@ Now we need to create the actual product that comprises of the two GraphQL Subse
   - Select the correct GraphQL subsets
   - Press Create! 
 
+**Creation of The Tweet and Statistics Product**
+
 ![The Tweet and Statistics Product](./documentation/TweetAndStatisticsProduct.png)
 
-## What's next? How do I make an app with this?
+**I've added an additional product as an extra example**
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+![Final GraphQL Products Page](./documentation/GraphQLProductsPage.png)
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+### Step 4: Create the customer
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+- Navigate to https://graphqlproductbuilder.co.uk/customers
+- Create the customer
+  - Add the customer name
+  - Add the customer description
+  - Select the correct GraphQL product to associate with the customer
+  - Press Create!
 
-## Learn More
+**Creation of the customer**
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+![Creation of the customer](./documentation/CreateGoogleCustomer.png)
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+**Final GraphQL customer page**
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+![Final GraphQL Customers Page](./documentation/GraphQLProductsPage.png)
 
-## How do I deploy this?
+### What happens now?
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+You have now uploaded the source of truth schema, you've created the underlying GraphQL Subsets, you've created the Product which is made up of the GraphQL Subsets and you've created the Customer along with the product you want them to be able to access.
 
-`docker build -t product-builder --build-arg NEXT_PUBLIC_CLIENTVAR=clientvar .`
+This application manages the source schema, the GraphQL Subsets, the GraphQL Products and the underlying Customers, but it currently doesn't integrate with any GraphQL Gateway. The next step would be to include the customer's API key and associate it with the customer entity in the database, then the GraphQL Gateway could make a request to the Product builder to map the API key to the correct GraphQL Schema for that customer.
+
+An example request life cycle with this integrated could look like this:
+
+![Example Request Life Cycle](./documentation/RequestLifecycle.png)
+
+## Next steps
+
+### Dynamic schema per customer
+
+As mentioned above, this application needs integrating with a GraphQL Gateway to allow for a dynamic schema per customer.
+
+### Locking down the application
+
+If you want to deploy this application for your GraphQL Gateway, you will need to lock this application down to only those who need it. You can do this by:
+- Creating a NextJS middleware which checks that the requesting user is logged in and is allowlisted to access the website. This is a front end check.
+- Creating and using a new tRPC procedure which checks if the user is logged in and allowlisted to access the queries and mutations specified.
+- Remove the demonstrative user toggle switch 
+
+### Automatic schema ingestion
+
+Whenever the underlying GraphQL schema changes, we don't want to have to manually update it. A new feature would be to allow for automatic schema ingestion. This would ensure that the GraphQL Product Builder always has the latest changes and there's no manual intervention needed.
+
+### Integration testing GraphQL Schema updates
+
+Whenever you want to make a change to the GraphQL schema of a subset, I want integration testing to be performed.
+
+GraphQL Products are made up of many GraphQL Subsets by composing their GraphQL schemas into a single schema. If I make a change to one of the GraphQL subsets, it will cause the GraphQL Products to have a different schema. I want to ensure that the new resulting GraphQL Product schema is valid by the following checks:
+#### Statically check it is a valid schema
+
+This can be done by parsing the schema and checking there are no errors when parsing.
+
+#### Statically check that it contains no breaking changes
+
+This can be done by running it through the GraphQL schema diffing tool which finds any breaking changes.
+
+#### Execute against the schema to test it is a valid schema
+
+This could work by:
+
+- GraphQL Subset test:
+  - Each GraphQL subset has its own integration test query. 
+  - The GraphQL Product Builder will call the GraphQL Gateway with the query and a special header that overrides the schema with the schema of the GraphQL Subset.
+  - The GraphQL Product Builder will receive the response
+  - The GraphQL Product Builder will check that the response is a 200 and contains no errors.
+  - The GraphQL Product Builder will check that the response contains data that is of the correct schema type.
+  - If the GraphQL subset integration checks pass, it will move on to the GraphQL Product tests
+- GraphQL Product Tests:
+  - For each GraphQL Product that the edited GraphQL Subset is associated with:
+     - The GraphQL Product Builder will calculate the new GraphQL schema for each product
+     - For each GraphLQ Subset of each GraphQL Product
+        - The GraphQL Product Builder will call the GraphQL Gateway with the GraphQL Subset integration query and a special header that overrides the schema with the schema of the new GraphQL product schema.
+          - The GraphQL Product Builder will receive the response
+          - The GraphQL Product Builder will check that the response is a 200 and contains no errors.
+          - The GraphQL Product Builder will check that the response contains data that is of the correct schema type.
+  - If every single GraphQL query succeeds and matches the correct shape, the test will pass and the edited schemas will be committed to the database
+
+This same approach should be applied when updating a product to have different GraphQL Subsets.
+
+#### Approval workflow
+
+This approach does not follow the "two person rule" approach. I'd like any change made to need to go through a review process. The full details of this will need to be fleshed out.
+
+## Technology Stack
+
+The stack was based on [Create T3 App](https://create.t3.gg), a starting template for a full stack type-safe application. The stack includes:
+
+- Typescript
+- Next.js
+- tRPC
+- Prisma
+- Tailwind CSS
+- NextAuth.js
+
+For more information about why these technologies were used, check out the [why](https://create.t3.gg/en/why) page.
+
+## Project Structure
+
+### `src/cdk`
+
+This directory contains the infrastructure as code that defines how to deploy this application to AWS. This includes a CI/CD Pipeline which has a webhook into the Github repo and will deploy every time there has been a change to the repo.
+
+There are the following stacks:
+
+- Hosted Zone Stack - Contains the Hosted Zone required for DNS
+- VPC Stack - Contains the Virtual Private Cloud infrastructure to provide networking in the cloud.
+- Docker Image Stack - Builds the docker image 
+- Database Stack - Contains the RDS instance
+- Fargate Stack - Contains the Application load balanced Fargate service
+- Pipeline Stack - Contains resources required for the pipeline
+
+### `src/pages/`
+
+Contains the definitions for the routes for all the pages and the API endpoints.
+
+### `src/sections/`
+
+Contains the front end React components.
+
+### `src/server/`
+
+Contains the code that is run on the server side, including all of the routers and procedures for the API.
+
+### `src/styles/`
+
+Contains the global styles.
+
+### `tst/`
+
+Contains the jest tests.
+
+
+## Entity Diagram
+
+![Entity Diagram](./documentation/EntityDiagram.png)
