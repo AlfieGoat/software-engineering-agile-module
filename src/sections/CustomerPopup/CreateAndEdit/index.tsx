@@ -10,6 +10,7 @@ import { type Customer, type Product } from "@prisma/client";
 import produce from "immer";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
+import { DismissibleErrorPopup } from "~/sections/DismissibleErrorPopup";
 import { api } from "~/utils/api";
 import { formDataAtom, productComponentLoadingAtom } from "./atoms";
 import { Content } from "./Content";
@@ -83,6 +84,13 @@ const CustomerPopup = (props: CreateNewCustomerProps | EditCustomerProps) => {
           productSubsetComponentLoading ? "none" : ""
         }`}
       >
+        {[
+          customerCreateMutation.error?.message,
+          customerUpdateMutation.error?.message,
+        ].map((item) => {
+          if (!item) return;
+          return <DismissibleErrorPopup error={item} key={item} />;
+        })}
         <Input
           type="text"
           name="name"

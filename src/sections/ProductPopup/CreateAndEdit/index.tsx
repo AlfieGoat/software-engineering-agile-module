@@ -10,6 +10,7 @@ import { type GraphQLSubset, type Product } from "@prisma/client";
 import produce from "immer";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
+import { DismissibleErrorPopup } from "~/sections/DismissibleErrorPopup";
 import { api } from "~/utils/api";
 import { formDataAtom, graphQLSubsetComponentLoadingAtom } from "./atoms";
 import { Content } from "./Content";
@@ -85,6 +86,13 @@ const ProductPopup = (props: CreateNewProductsProps | EditProductsProps) => {
           graphQLSubsetComponentLoading ? "none" : ""
         }`}
       >
+        {[
+          productCreateMutation.error?.message,
+          productUpdateMutation.error?.message,
+        ].map((item) => {
+          if (!item) return;
+          return <DismissibleErrorPopup error={item} key={item} />;
+        })}
         <Input
           type="text"
           name="name"

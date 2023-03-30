@@ -8,23 +8,25 @@ export const onSubmit = async (
   productCreateMutation: ReturnType<typeof api.customer.create.useMutation>,
   productUpdateMutation: ReturnType<typeof api.customer.updateById.useMutation>
 ) => {
-  if (props.type === "Create") {
-    await productCreateMutation.mutateAsync({
-      name: formData.name,
-      productId: formData.productId,
-      description: formData.description,
-    });
-  } else {
-    await productUpdateMutation.mutateAsync({
-      customerId: props.customerToEdit.id,
-      editedCustomer: {
+  try {
+    if (props.type === "Create") {
+      await productCreateMutation.mutateAsync({
         name: formData.name,
         productId: formData.productId,
         description: formData.description,
-      },
-    });
-  }
-  await props.refetchCustomersData();
-  props.closePopup();
-  props.removeSelected();
+      });
+    } else {
+      await productUpdateMutation.mutateAsync({
+        customerId: props.customerToEdit.id,
+        editedCustomer: {
+          name: formData.name,
+          productId: formData.productId,
+          description: formData.description,
+        },
+      });
+    }
+    await props.refetchCustomersData();
+    props.closePopup();
+    props.removeSelected();
+  } catch {}
 };

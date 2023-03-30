@@ -8,27 +8,29 @@ export const onSubmit = async (
   productCreateMutation: ReturnType<typeof api.product.create.useMutation>,
   productUpdateMutation: ReturnType<typeof api.product.updateById.useMutation>
 ) => {
-  if (props.type === "Create") {
-    await productCreateMutation.mutateAsync({
-      description: formData.description,
-      name: formData.name,
-      graphQLSubsets: formData.graphQLSubsetIds.map((graphQLSubsetId) => ({
-        id: graphQLSubsetId,
-      })),
-    });
-  } else {
-    await productUpdateMutation.mutateAsync({
-      productId: props.productToEdit.id,
-      editedProduct: {
+  try {
+    if (props.type === "Create") {
+      await productCreateMutation.mutateAsync({
         description: formData.description,
         name: formData.name,
         graphQLSubsets: formData.graphQLSubsetIds.map((graphQLSubsetId) => ({
           id: graphQLSubsetId,
         })),
-      },
-    });
-  }
-  await props.refetchProductsData();
-  props.closePopup();
-  props.removeSelected();
+      });
+    } else {
+      await productUpdateMutation.mutateAsync({
+        productId: props.productToEdit.id,
+        editedProduct: {
+          description: formData.description,
+          name: formData.name,
+          graphQLSubsets: formData.graphQLSubsetIds.map((graphQLSubsetId) => ({
+            id: graphQLSubsetId,
+          })),
+        },
+      });
+    }
+    await props.refetchProductsData();
+    props.closePopup();
+    props.removeSelected();
+  } catch {}
 };

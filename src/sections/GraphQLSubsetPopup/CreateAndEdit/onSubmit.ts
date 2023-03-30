@@ -15,23 +15,25 @@ export const onSubmit = async (
     typeof api.graphQLSubset.updateById.useMutation
   >
 ) => {
-  if (props.type === "Create") {
-    await productCreateMutation.mutateAsync({
-      description: formData.description,
-      name: formData.name,
-      graphQLSchema: formData.graphQLSchema,
-    });
-  } else {
-    await productUpdateMutation.mutateAsync({
-      graphQLSubsetId: props.graphQLSubsetToEdit.id,
-      editedGraphQLSubset: {
+  try {
+    if (props.type === "Create") {
+      await productCreateMutation.mutateAsync({
         description: formData.description,
         name: formData.name,
         graphQLSchema: formData.graphQLSchema,
-      },
-    });
-  }
-  await props.refetchGraphQLSubsetsData();
-  props.closePopup();
-  props.removeSelected();
+      });
+    } else {
+      await productUpdateMutation.mutateAsync({
+        graphQLSubsetId: props.graphQLSubsetToEdit.id,
+        editedGraphQLSubset: {
+          description: formData.description,
+          name: formData.name,
+          graphQLSchema: formData.graphQLSchema,
+        },
+      });
+    }
+    await props.refetchGraphQLSubsetsData();
+    props.closePopup();
+    props.removeSelected();
+  } catch {}
 };

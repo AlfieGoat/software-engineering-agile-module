@@ -9,7 +9,7 @@ import {
 import { type GraphQLSubset } from "@prisma/client";
 import produce from "immer";
 import { useAtom } from "jotai";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
 import { formDataAtom } from "./atoms";
 import { Content } from "./Content";
@@ -17,6 +17,7 @@ import { onSubmit } from "./onSubmit";
 import { setInitialFormData } from "./setInitialFormData";
 
 import { SchemaExplorer } from "../../SchemaExplorer";
+import { DismissibleErrorPopup } from "../../DismissibleErrorPopup";
 
 export interface CreateNewGraphQLSubsetsProps {
   type: "Create";
@@ -81,6 +82,13 @@ const GraphQLSubsetPopup = (
       }
     >
       <div className="flex flex-col space-y-4 p-2">
+        {[
+          graphQLSubsetCreateMutation.error?.message,
+          graphQLSubsetUpdateMutation.error?.message,
+        ].map((item) => {
+          if (!item) return;
+          return <DismissibleErrorPopup error={item} key={item} />;
+        })}
         <Input
           type="text"
           name="name"

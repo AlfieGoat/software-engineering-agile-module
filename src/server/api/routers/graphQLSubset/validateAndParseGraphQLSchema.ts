@@ -9,7 +9,7 @@ export const validateAndParseGraphQLSchema = (graphQLSchema: string) => {
   } catch (e) {
     throw new TRPCError({
       code: "BAD_REQUEST",
-      message: "The schema that was supplied was invalid.",
+      message: "The schema that was supplied was invalid. This may be because you have clicked a drop down, but not selected a field from the drop down.",
       cause: e,
     });
   }
