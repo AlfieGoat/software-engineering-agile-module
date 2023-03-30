@@ -3,6 +3,7 @@ import { useAtom } from "jotai";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { api } from "~/utils/api";
+import { capitalizeFirstLetter } from "./capitalizeFirstLetter";
 import { userRoleAtom } from "./userRoleAtom";
 
 export const ToggleUserRole = () => {
@@ -33,7 +34,3 @@ export const ToggleUserRole = () => {
     </Toggle>
   );
 };
-
-function capitalizeFirstLetter(string: string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
