@@ -1,6 +1,5 @@
 import { Toggle } from "@cloudscape-design/components";
 import { useAtom } from "jotai";
-import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { api } from "~/utils/api";
 import { capitalizeFirstLetter } from "./capitalizeFirstLetter";
@@ -8,16 +7,17 @@ import { userRoleAtom } from "./userRoleAtom";
 
 export const ToggleUserRole = () => {
   const changeUserRoleMutation = api.user.setUserRole.useMutation();
-
-  const session = useSession();
+  const sessionQuery = api.user.getCurrentRole.useQuery();
 
   const [currentRole, setCurrentRole] = useAtom(userRoleAtom);
 
   useEffect(() => {
-    if (session.data) setCurrentRole(session.data.user.role);
-  }, [session.data]);
+    if (sessionQuery.data) {
+      setCurrentRole(sessionQuery.data);
+    }
+  }, [sessionQuery.data]);
 
-  if (!session.data || !currentRole) return <></>;
+  if (!sessionQuery.data || !currentRole) return <></>;
 
   return (
     <Toggle
@@ -27,6 +27,7 @@ export const ToggleUserRole = () => {
           newRole: currentRole === "admin" ? "user" : "admin",
         });
         setCurrentRole(newRole);
+        await sessionQuery.refetch();
       }}
       ariaLabel={`Change role to ${currentRole === "admin" ? "user" : "admin"}`}
     >

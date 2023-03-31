@@ -1,9 +1,6 @@
 import { z } from "zod";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 import { UserRole } from "@prisma/client";
 
@@ -18,4 +15,8 @@ export const userRouter = createTRPCRouter({
 
       return input.newRole;
     }),
+
+  getCurrentRole: protectedProcedure.query(({ ctx }) => {
+    return ctx.session.user.role;
+  }),
 });
