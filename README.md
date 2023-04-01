@@ -2,6 +2,33 @@
 
 The GraphQL Product Builder allows for bespoke GraphQL schemas to be generated.
 
+## Bootstrapping
+
+### Pre-requisites
+
+- NPM must be installed 
+- Node must be installed
+- You must have a MySQL instance running
+
+### Steps
+
+#### One-time setup
+1. Clone this Repo 
+1. Run `npm install`
+1. [Create your own Github SSO Provider](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app)
+   - Follow the above instructions
+   - Auth callback URL should be `http://localhost:3000/api/auth/callback/github`
+   - Homepage URL should be `http://localhost:3000`
+1. Create your own `.env` file using the `.env.example` as a template. `.env` is where your dev server will load your environment variables from. Environment variables are checked against a schema at runtime in `src/env.mjs`, so your server will spit out errors if your environment variables don't match the schema.
+   1. `DATABASE_URL` should be the URL to your MySQL DB
+   1. `NEXTAUTH_URL` should be `http://localhost:3000`
+   1. `GITHUB_CLIENT_ID` should come from the OAuth App you just created on Github
+   1. `GITHUB_CLIENT_SECRET` should come from the OAuth App you just created on Github
+1. Run `npx prisma db push` to sync your Prisma schema with your MySQL DB
+
+#### Start the dev server
+1. Run `npm run dev` to run a dev version of your application
+
 ## Background
 
 ### What is GraphQL
@@ -171,6 +198,11 @@ Now we need to create the actual product that comprises of the two GraphQL Subse
 
 ![Final GraphQL Customers Page](./documentation/GraphQLProductsPage.png)
 
+### Recap
+The below diagram shows the complete flow of how customers gain access to a product, a product is a composition of GraphQL Subsets and how GraphQL Subsets are constructed from a chunk of the GraphQL Source Schema, as described in the steps above.
+
+![Entity Diagram](./documentation/EntityDiagram.png)
+
 ### What happens now?
 
 You have now uploaded the source of truth schema, you've created the underlying GraphQL Subsets, you've created the Product which is made up of the GraphQL Subsets and you've created the Customer along with the product you want them to be able to access.
@@ -286,7 +318,6 @@ Contains the global styles.
 
 Contains the jest tests.
 
+## Architecture Diagram
 
-## Entity Diagram
-
-![Entity Diagram](./documentation/EntityDiagram.png)
+![Architecture Diagram](./documentation/ArchitectureDiagram.png)
