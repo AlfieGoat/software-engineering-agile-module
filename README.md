@@ -321,3 +321,9 @@ Contains the jest tests.
 ## Architecture Diagram
 
 ![Architecture Diagram](./documentation/ArchitectureDiagram.png)
+
+The above diagram shows the System architecture diagram for the GPB. Infrastructure is defined in code using AWS CDK. There is an AWS Code Pipeline which has a web hook into the Github repo which will build and deploy any changes made in the Github repo. 
+
+Route 53 handles DNS, the VPC provides networking in the cloud, the application load balancer distributes requests across the Fargate tasks based on current utilization and Fargate can scale the number of tasks up and down depending on the load, however this feature is disabled for cost savings measures in this assignment. 
+
+In the private subnet, there is a MySQL RDS cluster which provides the application servers with the database. This database can be configured to be deployed to multi-availability zones, but this is disabled in this assignment for costs savings.
