@@ -17,13 +17,13 @@ datasource db {
 model SourceGraphQLSchema {
     id            String   @id @default(cuid())
     createdAt     DateTime @default(now())
-    graphQLSchema String   @db.Text
+    graphQLSchema String   @db.LongText
 }
 
 model GraphQLSubset {
     id            String    @id @default(cuid())
     createdAt     DateTime  @default(now())
-    graphQLSchema String    @db.Text
+    graphQLSchema String    @db.LongText
     name          String
     description   String    @db.Text
     products      Product[]
@@ -32,7 +32,7 @@ model GraphQLSubset {
 model Product {
     id            String          @id @default(cuid())
     createdAt     DateTime        @default(now())
-    graphQLSchema String          @db.Text
+    graphQLSchema String          @db.LongText
     name          String
     description   String          @db.Text
     customers     Customer[]
