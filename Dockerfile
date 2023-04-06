@@ -51,7 +51,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=deps --chown=nextjs:nodejs /app/prisma/* ./prisma/*
+COPY --from=deps --chown=nextjs:nodejs /app/prisma/ ./prisma/
 COPY --from=deps --chown=nextjs:nodejs /app/entrypoint.sh ./entrypoint.sh
 
 RUN ls -a
