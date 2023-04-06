@@ -143,6 +143,7 @@ export class DatabaseStack extends Stack {
     new RunTask(this, "RunDemoTaskOnce", {
       task: taskDefinition,
       cluster,
+      assignPublicIp: true,
     });
   }
 
