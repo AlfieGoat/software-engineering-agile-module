@@ -9,15 +9,15 @@ import TextFilter from "@cloudscape-design/components/text-filter";
 
 import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
 import { type Customer, type Product } from "@prisma/client";
+import CustomHead from "~/sections/CustomHead";
 import CustomerProduct from "~/sections/Customer/CustomersProduct";
 import CustomerPopup from "~/sections/CustomerPopup/CreateAndEdit/index";
-import CustomHead from "~/sections/CustomHead";
 import HomeButton from "~/sections/HomeButton";
 import { SchemaExplorer } from "~/sections/SchemaExplorer";
 import { type Popup } from "~/sections/sharedPopup/state";
 import { api } from "~/utils/api";
-import { EmptyDisplay } from "../sections/EmptyDisplay";
 import { createVisibleSections } from "~/utils/cloudscapeCardUtils/createVisibleSections";
+import { EmptyDisplay } from "../sections/EmptyDisplay";
 
 const PAGE_SIZE = 8;
 
@@ -53,7 +53,10 @@ const CARD_DEFINITION: CardsProps.CardDefinition<Item> = {
       header: "Product Schema Explorer",
       content: (e) => (
         <div>
-          <SchemaExplorer schema={e.product.graphQLSchema} />
+          <SchemaExplorer
+            schema={e.product.graphQLSchema}
+            type="SchemaExplorerPropsQueryStoredInternally"
+          />
         </div>
       ),
     },

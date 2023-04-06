@@ -104,6 +104,10 @@ describe("Product Router", () => {
             hello(id: ID!): String
           }`,
           name: "",
+          query: `query MyQuery {
+            __typename ## Placeholder value
+          }
+          `,
         },
       ]);
 
@@ -421,6 +425,10 @@ describe("Product Router", () => {
               hello(id: ID!): String
             }`,
           name: "",
+          query: `query MyQuery {
+        __typename ## Placeholder value
+      }
+      `,
         },
       ];
       const product = {

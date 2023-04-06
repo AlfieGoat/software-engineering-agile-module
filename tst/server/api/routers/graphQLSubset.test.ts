@@ -12,6 +12,11 @@ beforeEach(() => {
   mockCtx = createTestContext();
 });
 
+const FAKE_QUERY = `query MyQuery {
+  __typename ## Placeholder value
+}
+`;
+
 describe("GraphQL Subset Router", () => {
   describe("Create", () => {
     test("should create a new GraphQL subset", async () => {
@@ -21,6 +26,7 @@ describe("GraphQL Subset Router", () => {
             hello: String!
           }
         `,
+        query: FAKE_QUERY,
         name: "Test Subset",
         description: "A GraphQL subset for testing purposes",
       };
@@ -32,6 +38,7 @@ describe("GraphQL Subset Router", () => {
         description: input.description,
         createdAt: new Date(),
         updatedAt: new Date(),
+        query: FAKE_QUERY,
       };
 
       mockCtx.prisma.graphQLSubset.create.mockResolvedValue(newGraphQLSubset);
@@ -44,6 +51,7 @@ describe("GraphQL Subset Router", () => {
           graphQLSchema: input.graphQLSchema,
           name: input.name,
           description: input.description,
+          query: FAKE_QUERY,
         },
       });
     });
@@ -64,6 +72,7 @@ describe("GraphQL Subset Router", () => {
         description: "A GraphQL subset for testing purposes",
         createdAt: new Date(),
         updatedAt: new Date(),
+        query: FAKE_QUERY,
       };
 
       mockCtx.prisma.graphQLSubset.findUnique.mockResolvedValue(graphQLSubset);
@@ -97,6 +106,7 @@ describe("GraphQL Subset Router", () => {
           description: "A GraphQL subset for testing purposes",
           createdAt: new Date(),
           updatedAt: new Date(),
+          query: FAKE_QUERY,
         },
         {
           id: "2",
@@ -109,6 +119,7 @@ describe("GraphQL Subset Router", () => {
           description: "Another GraphQL subset for testing purposes",
           createdAt: new Date(),
           updatedAt: new Date(),
+          query: FAKE_QUERY,
         },
       ];
 
@@ -151,6 +162,7 @@ describe("GraphQL Subset Router", () => {
         }`,
         name: "Edited Test Subset",
         description: "An edited GraphQL subset for testing purposes",
+        query: FAKE_QUERY,
       };
 
       const oldGraphQLSubset: GraphQLSubset & {
@@ -165,6 +177,7 @@ describe("GraphQL Subset Router", () => {
         name: "Test Subset",
         description: "A GraphQL subset for testing purposes",
         createdAt: new Date(),
+        query: FAKE_QUERY,
         products: [
           {
             createdAt: new Date(),
@@ -183,6 +196,7 @@ describe("GraphQL Subset Router", () => {
             }`,
                 description: "",
                 name: "",
+                query: FAKE_QUERY,
               },
             ],
           },
@@ -196,6 +210,7 @@ describe("GraphQL Subset Router", () => {
         description: editedGraphQLSubset.description,
         createdAt: oldGraphQLSubset.createdAt,
         updatedAt: new Date(),
+        query: FAKE_QUERY,
       };
 
       const updateProductSpy = jest.spyOn(updateProduct, "updateProduct");
@@ -237,6 +252,7 @@ describe("GraphQL Subset Router", () => {
           graphQLSchema: editedGraphQLSubset.graphQLSchema,
           name: editedGraphQLSubset.name,
           description: editedGraphQLSubset.description,
+          query: FAKE_QUERY,
         },
       });
       expect(mockCtx.prisma.$transaction).toHaveBeenCalled();
@@ -262,6 +278,7 @@ describe("GraphQL Subset Router", () => {
         graphQLSchema: "brokenSchema",
         name: "Test Subset",
         description: "A GraphQL subset for testing purposes",
+        query: FAKE_QUERY,
       };
 
       const graphQLSubset: GraphQLSubset & {
@@ -274,6 +291,7 @@ describe("GraphQL Subset Router", () => {
         graphQLSchema: "",
         id: "",
         name: "",
+        query: FAKE_QUERY,
         products: [
           {
             createdAt: new Date(),
@@ -288,6 +306,7 @@ describe("GraphQL Subset Router", () => {
                 graphQLSchema: "",
                 id: "",
                 name: "",
+                query: FAKE_QUERY,
               },
             ],
           },
@@ -326,6 +345,7 @@ describe("GraphQL Subset Router", () => {
       `,
         name: "Test Subset",
         description: "A GraphQL subset for testing purposes",
+        query: FAKE_QUERY,
       };
 
       const mockError = new TRPCError({
@@ -350,6 +370,7 @@ describe("GraphQL Subset Router", () => {
         graphQLSchema: "",
         id: "",
         name: "",
+        query: FAKE_QUERY,
         products: [
           {
             createdAt: new Date(),
@@ -364,6 +385,7 @@ describe("GraphQL Subset Router", () => {
                 graphQLSchema: "",
                 id: "",
                 name: "",
+                query: FAKE_QUERY,
               },
             ],
           },
@@ -403,6 +425,7 @@ describe("GraphQL Subset Router", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         products: [],
+        query: FAKE_QUERY,
       };
       mockCtx.prisma.graphQLSubset.findUniqueOrThrow.mockResolvedValue(subset);
       mockCtx.prisma.graphQLSubset.delete.mockResolvedValue(subset);
@@ -430,6 +453,7 @@ describe("GraphQL Subset Router", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         products: [{ id: "1" }],
+        query: FAKE_QUERY,
       };
       mockCtx.prisma.graphQLSubset.findUniqueOrThrow.mockResolvedValue(subset);
 

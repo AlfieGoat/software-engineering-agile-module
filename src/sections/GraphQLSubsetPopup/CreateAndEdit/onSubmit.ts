@@ -8,27 +8,27 @@ import {
 export const onSubmit = async (
   formData: FormData,
   props: CreateNewGraphQLSubsetsProps | EditGraphQLSubsetPopupProps,
-  productCreateMutation: ReturnType<
-    typeof api.graphQLSubset.create.useMutation
-  >,
-  productUpdateMutation: ReturnType<
+  subsetCreateMutation: ReturnType<typeof api.graphQLSubset.create.useMutation>,
+  subsetUpdateMutation: ReturnType<
     typeof api.graphQLSubset.updateById.useMutation
   >
 ) => {
   try {
     if (props.type === "Create") {
-      await productCreateMutation.mutateAsync({
+      await subsetCreateMutation.mutateAsync({
         description: formData.description,
         name: formData.name,
         graphQLSchema: formData.graphQLSchema,
+        query: formData.query,
       });
     } else {
-      await productUpdateMutation.mutateAsync({
+      await subsetUpdateMutation.mutateAsync({
         graphQLSubsetId: props.graphQLSubsetToEdit.id,
         editedGraphQLSubset: {
           description: formData.description,
           name: formData.name,
           graphQLSchema: formData.graphQLSchema,
+          query: formData.query,
         },
       });
     }

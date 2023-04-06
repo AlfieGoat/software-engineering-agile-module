@@ -66,7 +66,10 @@ const CARD_DEFINITION: CardsProps.CardDefinition<Item> = {
       header: "Product Schema Explorer",
       content: (e) => (
         <div>
-          <SchemaExplorer schema={e.graphQLSchema} />
+          <SchemaExplorer
+            schema={e.graphQLSchema}
+            type="SchemaExplorerPropsQueryStoredInternally"
+          />
         </div>
       ),
     },

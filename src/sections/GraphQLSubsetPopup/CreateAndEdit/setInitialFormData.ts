@@ -16,9 +16,10 @@ export function setInitialFormData(
         draft.graphQLSchema = props.graphQLSubsetToEdit.graphQLSchema;
         draft.description = props.graphQLSubsetToEdit.description;
         draft.name = props.graphQLSubsetToEdit.name;
+        draft.query = props.graphQLSubsetToEdit.query ?? "";
       }, formData)
     );
   } else if (props.type === "Create") {
-    setFormData({ description: "", name: "", graphQLSchema: "" });
+    setFormData({ description: "", name: "", graphQLSchema: "", query: "" });
   }
 }

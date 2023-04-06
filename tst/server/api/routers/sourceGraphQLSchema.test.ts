@@ -83,6 +83,10 @@ describe("SourceGraphQLSchema Router", () => {
           graphQLSchema: `type Query {
         hello(id: ID!): String
       }`,
+      query: `query MyQuery {
+        __typename ## Placeholder value
+      }
+      `
         },
       ]);
 

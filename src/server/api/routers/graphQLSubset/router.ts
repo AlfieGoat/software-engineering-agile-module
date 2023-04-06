@@ -24,15 +24,16 @@ export const graphQLSubsetRouter = createTRPCRouter({
         graphQLSchema: z.string(),
         name: NAME_SCHEMA,
         description: DESCRIPTION_SCHEMA,
+        query: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { graphQLSchema, name, description } = input;
+      const { graphQLSchema, name, description, query } = input;
 
       validateAndParseGraphQLSchema(graphQLSchema);
 
       const subset = await ctx.prisma.graphQLSubset.create({
-        data: { graphQLSchema, name, description },
+        data: { graphQLSchema, name, description, query },
       });
 
       return subset;
@@ -98,6 +99,7 @@ export const graphQLSubsetRouter = createTRPCRouter({
           graphQLSchema: z.string(),
           name: NAME_SCHEMA,
           description: DESCRIPTION_SCHEMA,
+          query: z.string(),
         }),
       })
     )
@@ -120,6 +122,7 @@ export const graphQLSubsetRouter = createTRPCRouter({
             graphQLSchema: input.editedGraphQLSubset.graphQLSchema,
             name: input.editedGraphQLSubset.name,
             description: input.editedGraphQLSubset.description,
+            query: input.editedGraphQLSubset.query,
           },
         });
 

@@ -116,7 +116,14 @@ const GraphQLSubsetPopup = (
         />
         <div className="rounded-xl border-2 border-gray-400 p-4">
           <SchemaExplorer
+          type="SchemaExplorerPropsQueryStoredExternally"
+          query={formData.query}
             onEdit={async (query) => {
+              setFormData(
+                produce((draft) => {
+                  draft.query = query;
+                }, formData)
+              );
               if (query.includes("Placeholder")) return;
               try {
                 const data =
