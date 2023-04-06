@@ -27,6 +27,7 @@ model GraphQLSubset {
     name          String
     description   String    @db.Text
     products      Product[]
+    query         String?   @db.LongText
 }
 
 model Product {
