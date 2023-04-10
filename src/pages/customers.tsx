@@ -12,6 +12,7 @@ import { type Customer, type Product } from "@prisma/client";
 import CustomHead from "~/sections/CustomHead";
 import CustomerProduct from "~/sections/Customer/CustomersProduct";
 import CustomerPopup from "~/sections/CustomerPopup/CreateAndEdit/index";
+import { DismissibleErrorPopup } from "~/sections/DismissibleErrorPopup";
 import HomeButton from "~/sections/HomeButton";
 import { SchemaExplorer } from "~/sections/SchemaExplorer";
 import { type Popup } from "~/sections/sharedPopup/state";
@@ -106,14 +107,24 @@ const Home: NextPage = () => {
               visibleSections={createVisibleSections<Item>(CARD_DEFINITION)}
               empty={<EmptyDisplay setPopupState={setPopupState} />}
               filter={
-                <TextFilter
-                  filteringPlaceholder="Find customer"
-                  filteringText={filterText || ""}
-                  onChange={(data) => {
-                    setPaginationIndex(0);
-                    setFilterText(data.detail.filteringText);
-                  }}
-                />
+                <>
+                  <TextFilter
+                    filteringPlaceholder="Find customer"
+                    filteringText={filterText || ""}
+                    onChange={(data) => {
+                      setPaginationIndex(0);
+                      setFilterText(data.detail.filteringText);
+                    }}
+                  />
+                  {[customersDeleteMutation.error?.message].map((item) => {
+                    if (!item) return;
+                    return (
+                      <div key={item} className="mt-4">
+                        <DismissibleErrorPopup error={item} />
+                      </div>
+                    );
+                  })}
+                </>
               }
               header={
                 <Header

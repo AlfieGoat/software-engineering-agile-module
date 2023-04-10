@@ -14,6 +14,7 @@ import {
   type Product,
 } from "@prisma/client";
 import CustomHead from "~/sections/CustomHead";
+import { DismissibleErrorPopup } from "~/sections/DismissibleErrorPopup";
 import { EmptyDisplay } from "~/sections/EmptyDisplay";
 import HomeButton from "~/sections/HomeButton";
 import ProductPopup from "~/sections/ProductPopup/CreateAndEdit/index";
@@ -119,14 +120,24 @@ const Home: NextPage = () => {
               visibleSections={createVisibleSections<Item>(CARD_DEFINITION)}
               empty={<EmptyDisplay setPopupState={setPopupState} />}
               filter={
-                <TextFilter
-                  filteringPlaceholder="Find product"
-                  filteringText={filterText || ""}
-                  onChange={(data) => {
-                    setPaginationIndex(0);
-                    setFilterText(data.detail.filteringText);
-                  }}
-                />
+                <>
+                  <TextFilter
+                    filteringPlaceholder="Find product"
+                    filteringText={filterText || ""}
+                    onChange={(data) => {
+                      setPaginationIndex(0);
+                      setFilterText(data.detail.filteringText);
+                    }}
+                  />
+                  {[productsDeleteMutation.error?.message].map((item) => {
+                    if (!item) return;
+                    return (
+                      <div key={item} className="mt-4">
+                        <DismissibleErrorPopup error={item} />
+                      </div>
+                    );
+                  })}
+                </>
               }
               header={
                 <Header

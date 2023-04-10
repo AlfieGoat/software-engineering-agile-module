@@ -9,8 +9,9 @@ import TextFilter from "@cloudscape-design/components/text-filter";
 
 import { AppLayout, SpaceBetween } from "@cloudscape-design/components";
 import { type GraphQLSubset, type Product } from "@prisma/client";
-import CustomerProduct from "~/sections/Customer/CustomersProduct";
 import CustomHead from "~/sections/CustomHead";
+import CustomerProduct from "~/sections/Customer/CustomersProduct";
+import { DismissibleErrorPopup } from "~/sections/DismissibleErrorPopup";
 import { EmptyDisplay } from "~/sections/EmptyDisplay";
 import GraphQLSubsetPopup from "~/sections/GraphQLSubsetPopup/CreateAndEdit";
 import HomeButton from "~/sections/HomeButton";
@@ -107,14 +108,25 @@ const Home: NextPage = () => {
               visibleSections={createVisibleSections<Item>(CARD_DEFINITION)}
               empty={<EmptyDisplay setPopupState={setPopupState} />}
               filter={
-                <TextFilter
-                  filteringPlaceholder="Find subset"
-                  filteringText={filterText || ""}
-                  onChange={(data) => {
-                    setPaginationIndex(0);
-                    setFilterText(data.detail.filteringText);
-                  }}
-                />
+                <>
+                  <TextFilter
+                    filteringPlaceholder="Find subset"
+                    filteringText={filterText || ""}
+                    onChange={(data) => {
+                      setPaginationIndex(0);
+                      setFilterText(data.detail.filteringText);
+                    }}
+                  />
+
+                  {[graphQLSubsetDeleteMutation.error?.message].map((item) => {
+                    if (!item) return;
+                    return (
+                      <div key={item} className="mt-4">
+                        <DismissibleErrorPopup error={item} />
+                      </div>
+                    );
+                  })}
+                </>
               }
               header={
                 <Header
