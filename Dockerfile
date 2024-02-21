@@ -14,7 +14,8 @@ COPY bin ./
 
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml\* ./
 
-RUN npm ci
+RUN yarn global add pnpm  && pnpm i
+RUN pnpm i
 
 ##### BUILDER
 
@@ -26,10 +27,10 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # ENV NEXT_TELEMETRY_DISABLED 1
+RUN yarn global add pnpm  && pnpm i
+RUN pnpm test
 
-RUN npm run test
-
-RUN SKIP_ENV_VALIDATION=1 npm run build
+RUN SKIP_ENV_VALIDATION=1 pnpm build
 
 ##### RUNNER
 

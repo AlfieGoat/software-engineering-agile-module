@@ -127,8 +127,7 @@ describe("Product Router", () => {
 
         schema {
           query: Query
-        }
-        ",
+        }",
                   "name": "Test product",
                   "subsets": {
                     "connect": [
@@ -458,8 +457,7 @@ describe("Product Router", () => {
 
 schema {
   query: Query
-}
-`,
+}`,
           name: input.editedProduct.name,
           subsets: { set: input.editedProduct.graphQLSubsets },
         },
