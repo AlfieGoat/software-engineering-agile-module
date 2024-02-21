@@ -31,5 +31,9 @@ export class PipelineStack extends Stack {
     const betaStage = new PipelineStage(this, "BetaStage", {});
 
     pipeline.addStage(betaStage);
+
+    const prodStage = new PipelineStage(this, "ProdStage", {});
+
+    pipeline.addStage(prodStage);
   }
 }
