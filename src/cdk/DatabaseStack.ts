@@ -25,6 +25,7 @@ import {
   Credentials,
   DatabaseCluster,
   DatabaseClusterEngine,
+  ParameterGroup,
   type IDatabaseCluster,
 } from "aws-cdk-lib/aws-rds";
 import { Secret, type ISecret } from "aws-cdk-lib/aws-secretsmanager";
@@ -74,16 +75,30 @@ export class DatabaseStack extends Stack {
       },
     });
 
+    const dbEngine = DatabaseClusterEngine.auroraMysql({
+      version: AuroraMysqlEngineVersion.VER_3_01_0,
+    });
+
+    const parameterGroupForInstance = new ParameterGroup(
+      this,
+      `${id}-DBParameterGroup`,
+      {
+        engine: dbEngine,
+        parameters: {
+          log_bin_trust_function_creators: "1",
+        },
+      }
+    );
+
     this.database = new DatabaseCluster(this, `${id}-DBCluster`, {
-      engine: DatabaseClusterEngine.auroraMysql({
-        version: AuroraMysqlEngineVersion.VER_3_05_1, // This represents Aurora MySQL 8.0 (select the version as per your requirement)
-      }),
+      engine: dbEngine,
       port: PORT,
       defaultDatabaseName: DATABASE_NAME,
       credentials: Credentials.fromSecret(this.databaseSecret),
       backup: { retention: Duration.days(14), preferredWindow: "01:00-02:00" },
       storageEncrypted: true,
       instanceProps: {
+        parameterGroup: parameterGroupForInstance,
         vpc: props.vpc,
         vpcSubnets: { subnetType: SubnetType.PRIVATE_ISOLATED },
         securityGroups: [dbSecurityGroup],
