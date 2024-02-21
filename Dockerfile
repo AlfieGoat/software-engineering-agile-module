@@ -1,5 +1,5 @@
 ##### DEPENDENCIES
-FROM --platform=linux/amd64 node:16-alpine3.16 AS deps
+FROM --platform=linux/amd64 public.ecr.aws/docker/library/node:20-alpine AS deps
 # RUN apk add --no-cache libc6-compat openssl1.1-compat
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
@@ -18,7 +18,7 @@ RUN npm ci
 
 ##### BUILDER
 
-FROM --platform=linux/amd64 node:16-alpine3.16 AS builder
+FROM --platform=linux/amd64 public.ecr.aws/docker/library/node:20-alpine AS builder
 ARG DATABASE_URL
 ARG NEXT_PUBLIC_CLIENTVAR
 WORKDIR /app
@@ -33,7 +33,7 @@ RUN SKIP_ENV_VALIDATION=1 npm run build
 
 ##### RUNNER
 
-FROM --platform=linux/amd64 node:16-alpine3.16 AS runner
+FROM --platform=linux/amd64 public.ecr.aws/docker/library/node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
