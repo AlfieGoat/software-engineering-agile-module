@@ -97,6 +97,7 @@ export class DatabaseStack extends Stack {
       credentials: Credentials.fromSecret(this.databaseSecret),
       backup: { retention: Duration.days(14), preferredWindow: "01:00-02:00" },
       storageEncrypted: true,
+      parameterGroup: parameterGroupForInstance,
       instanceProps: {
         parameterGroup: parameterGroupForInstance,
         vpc: props.vpc,
