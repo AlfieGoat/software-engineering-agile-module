@@ -105,7 +105,7 @@ export class DatabaseStack extends Stack {
         securityGroups: [dbSecurityGroup],
         allowMajorVersionUpgrade: true,
         autoMinorVersionUpgrade: true,
-        instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.SMALL),
+        instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.MEDIUM),
       },
     });
 
