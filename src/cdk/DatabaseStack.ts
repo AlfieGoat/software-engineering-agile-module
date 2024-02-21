@@ -63,7 +63,7 @@ export class DatabaseStack extends Stack {
     );
 
     this.databaseSecret = new Secret(this, `${id}-databaseSecret`, {
-      secretName: "db-root-secret",
+      secretName: `${id}-db-root-secret`,
       description: "Database root user credentials",
       generateSecretString: {
         secretStringTemplate: JSON.stringify({

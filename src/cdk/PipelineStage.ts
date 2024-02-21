@@ -19,19 +19,19 @@ export class PipelineStage extends Stage {
 
     const { vpc } = new VpcStack(this, "VpcStack", {});
 
-    const dockerImageStack = new DockerImageStack(this, "DockerImage", {
+    const dockerImageStack = new DockerImageStack(this, `${id}-DockerImage`, {
       dockerImageDirectory: join(__dirname, "../../"),
       dockerFile: join("./Dockerfile"),
     });
 
-    const databaseStack = new DatabaseStack(this, "DatabaseStack", {
+    const databaseStack = new DatabaseStack(this, `${id}-DatabaseStack`, {
       vpc,
       dockerImage: dockerImageStack.dockerImage,
     });
 
     const databaseUrl = databaseStack.getDatabaseUrl();
 
-    const fargateStack = new FargateStack(this, "ProductBuilder", {
+    const fargateStack = new FargateStack(this, `${id}-ProductBuilder`, {
       vpc,
 
       databaseUrl,

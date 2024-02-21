@@ -50,7 +50,7 @@ export class FargateStack extends Stack {
     const secretConfig = Secret.fromSecretNameV2(
       this,
       `${id}-SecretConfig`,
-      "ProductBuilderConfig"
+      `${id}-ProductBuilderConfig`
     );
 
     taskDefinition.addContainer(`${id}-FargateContainer`, {
