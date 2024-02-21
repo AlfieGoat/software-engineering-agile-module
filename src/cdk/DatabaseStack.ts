@@ -74,7 +74,9 @@ export class DatabaseStack extends Stack {
     });
 
     this.database = new DatabaseCluster(this, `${id}-DBCluster`, {
-      engine: DatabaseClusterEngine.AURORA_MYSQL,
+      engine: DatabaseClusterEngine.auroraMysql({
+        version: AuroraMysqlEngineVersion.VER_3_05_1, // This represents Aurora MySQL 8.0 (select the version as per your requirement)
+      }),
       port: PORT,
       defaultDatabaseName: DATABASE_NAME,
       credentials: Credentials.fromSecret(this.databaseSecret),
