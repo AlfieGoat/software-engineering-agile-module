@@ -1,4 +1,4 @@
-import { mergeTypeDefs } from "@graphql-toolkit/schema-merging";
+import { mergeTypeDefs } from "@graphql-tools/merge";
 import { type GraphQLSubset } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { type DocumentNode } from "graphql";

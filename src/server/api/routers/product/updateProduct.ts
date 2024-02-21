@@ -1,4 +1,4 @@
-import { printWithComments } from "@graphql-toolkit/schema-merging";
+import { printWithComments } from "@graphql-tools/utils";
 import { type Prisma, type PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { type z } from "zod";
@@ -13,7 +13,7 @@ const updateProduct = async (
       never,
       Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
     >,
-    "$connect" | "$disconnect" | "$on" | "$transaction" | "$use"
+    "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
   >
 ) => {
   const graphQLSubsets = await tx.graphQLSubset.findMany({
@@ -33,7 +33,7 @@ const updateProduct = async (
     });
 
   const mergedSchemas = mergeSchemas(graphQLSubsets);
-  const mergedSchemasSdl = printWithComments(mergedSchemas) as string;
+  const mergedSchemasSdl = printWithComments(mergedSchemas);
 
   return tx.product.update({
     where: { id: productUpdateData.productId },
@@ -46,6 +46,6 @@ const updateProduct = async (
   });
 };
 
-const def = {updateProduct};
+const def = { updateProduct };
 
 export default def;

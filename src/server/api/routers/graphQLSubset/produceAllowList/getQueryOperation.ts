@@ -1,4 +1,4 @@
-import { ValidPathNode } from "../collectLeafPaths/getPathsToLeaves";
+import { type ValidPathNode } from "../collectLeafPaths/getPathsToLeaves";
 
 export const getQueryOperation = (field: ValidPathNode[]) => {
   const topLevelAncestor = field[0];

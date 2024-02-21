@@ -21,6 +21,7 @@ import {
 import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import {
+  AuroraMysqlEngineVersion,
   Credentials,
   DatabaseCluster,
   DatabaseClusterEngine,

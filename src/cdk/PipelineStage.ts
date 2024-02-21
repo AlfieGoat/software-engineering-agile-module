@@ -26,7 +26,7 @@ export class PipelineStage extends Stage {
 
     const databaseStack = new DatabaseStack(this, "DatabaseStack", {
       vpc,
-      dockerImage: dockerImageStack.dockerImage
+      dockerImage: dockerImageStack.dockerImage,
     });
 
     const databaseUrl = databaseStack.getDatabaseUrl();

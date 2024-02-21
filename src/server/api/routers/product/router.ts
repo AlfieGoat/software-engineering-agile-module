@@ -1,4 +1,4 @@
-import { printWithComments } from "@graphql-toolkit/schema-merging";
+import { printWithComments } from "@graphql-tools/utils";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -46,7 +46,7 @@ export const productRouter = createTRPCRouter({
         });
 
       const mergedSchemas = mergeSchemas(graphQLSubsets);
-      const mergedSchemasSdl = printWithComments(mergedSchemas) as string;
+      const mergedSchemasSdl = printWithComments(mergedSchemas);
 
       const product = await ctx.prisma.product.create({
         data: {
@@ -93,7 +93,7 @@ export const productRouter = createTRPCRouter({
           ? {
               where: {
                 OR: [
-                  { name: { contains: filterText} },
+                  { name: { contains: filterText } },
                   {
                     description: { contains: filterText },
                   },

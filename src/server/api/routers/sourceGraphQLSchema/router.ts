@@ -1,4 +1,4 @@
-import { printWithComments } from "@graphql-toolkit/schema-merging";
+import { printWithComments } from "@graphql-tools/utils";
 import { TRPCError } from "@trpc/server";
 import { getDiff } from "graphql-schema-diff";
 import { z } from "zod";
@@ -62,12 +62,13 @@ export const sourceGraphQLSchemaRouter = createTRPCRouter({
 
       const allGraphQLSubsets = await ctx.prisma.graphQLSubset.findMany({});
 
-      if (allGraphQLSubsets.length === 0) return "No GraphQL Subsets have been defined.";
+      if (allGraphQLSubsets.length === 0)
+        return "No GraphQL Subsets have been defined.";
 
       const allGraphQLSubsetsMerged = mergeSchemas(allGraphQLSubsets);
       const allGraphQLSubsetsMergedSdl = printWithComments(
         allGraphQLSubsetsMerged
-      ) as string;
+      );
 
       const schemaDiff = await getDiff(
         sourceGraphQLSchema.graphQLSchema,
