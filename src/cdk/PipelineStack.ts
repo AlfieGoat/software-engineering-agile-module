@@ -28,11 +28,15 @@ export class PipelineStack extends Stack {
       }),
     });
 
-    const betaStage = new PipelineStage(this, "BetaStage", {});
+    const betaStage = new PipelineStage(this, "BetaStage", {
+      domainName: "beta.graphqlproductbuilder.co.uk",
+    });
 
     pipeline.addStage(betaStage);
 
-    const prodStage = new PipelineStage(this, "ProdStage", {});
+    const prodStage = new PipelineStage(this, "ProdStage", {
+      domainName: "graphqlproductbuilder.co.uk",
+    });
 
     pipeline.addStage(prodStage);
   }

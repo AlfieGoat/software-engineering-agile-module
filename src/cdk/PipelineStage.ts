@@ -8,10 +8,14 @@ import { HostedZoneStack } from "./HostedZoneStack";
 import { VpcStack } from "./VpcStack";
 
 export class PipelineStage extends Stage {
-  constructor(scope: Construct, id: string, props: StageProps) {
+  constructor(
+    scope: Construct,
+    id: string,
+    props: StageProps & { domainName: string }
+  ) {
     super(scope, id, props);
 
-    const domainName = `graphqlproductbuilder.co.uk`;
+    const { domainName } = props;
 
     const hostedZoneStack = new HostedZoneStack(this, "HostedZoneStack", {
       domainName,
