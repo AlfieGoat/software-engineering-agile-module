@@ -35,7 +35,7 @@ export class PipelineStack extends Stack {
     pipeline.addStage(betaStage);
 
     const prodStage = new PipelineStage(this, "ProdStage", {
-      domainName: "graphqlproductbuilder.co.uk",
+      domainName: "prod.graphqlproductbuilder.co.uk",
     });
 
     pipeline.addStage(prodStage);
