@@ -1,6 +1,4 @@
-/// <reference types="cypress" />
-
-import { url } from "cypress/fixtures/url";
+import { url } from "../fixtures/url";
 import { addAndAssertSubset } from "../utils/addAndAssertSubset";
 import { createAndAssertCustomers } from "../utils/createAndAssertCustomers";
 import { createAndAssertProduct } from "../utils/createAndAssertProduct";
@@ -9,7 +7,6 @@ import { deleteAndAssertProducts } from "../utils/deleteAndAssertProducts";
 import { deleteAndAssertSubset } from "../utils/deleteAndAssertSubset";
 import { login } from "../utils/login";
 import { updateAndAssertSchemaUpdate } from "../utils/updateAndAssertSchemaUpdate";
-
 
 describe("Full E2E", () => {
   it("Regular user only has products and customer pages", () => {
