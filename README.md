@@ -1,12 +1,36 @@
 # GraphQL Product Builder
 
-The GraphQL Product Builder allows for bespoke GraphQL schemas to be generated.
+The GraphQL Product Builder allows for bespoke GraphQL schema subsets to be generated.
+
+Deployments of this application are accessible for easy marking:
+- https://beta.graphqlproductbuilder.co.uk
+- https://prod.graphqlproductbuilder.co.uk
+
+## DevOps
+
+### Architecture Diagram
+
+![Architecture Diagram](./documentation/ArchitectureDiagram.png)
+
+The above diagram shows the System architecture diagram for the GPB. Infrastructure is defined in code using AWS CDK in the `src/cdk` folder. 
+
+Route 53 handles DNS, the VPC provides networking in the cloud, the application load balancer distributes requests across the Fargate tasks based on current utilization and Fargate can scale the number of tasks up and down depending on the load, however this feature is disabled for cost savings measures in this assignment. 
+
+In the private subnet, there is a MySQL RDS cluster which provides the application servers with the database. This database can be configured to be deployed to multi-availability zones, but this is disabled in this assignment for costs savings.
+
+### Pipeline
+
+There is an AWS Code Pipeline which has a web hook from the Github repo. This will build and deploy any changes in the Github repo. This Code Pipeline has two deployment stages, as well as auxillary stages to handle CI/building the project. See the Appendix of this README to see a screenshot of the Code Pipeline.
+
+### Integration Testing
+
+The deployment stages make use of Cypress for end-to-end integration tests which tests the functionality of the website. This test works by first deploying to the Beta environment, then once the deployment has succeeded, the end-to-end integration tests will run against the live beta deployment. These tests ensure that regressions aren't introduced and functionality is maintained across all of the pages.
 
 ## Bootstrapping
 
 ### Pre-requisites
 
-- NPM must be installed 
+- PNPM must be installed 
 - Node must be installed
 - You must have a MySQL instance running
 
@@ -14,7 +38,7 @@ The GraphQL Product Builder allows for bespoke GraphQL schemas to be generated.
 
 #### One-time setup
 1. Clone this Repo 
-1. Run `npm install`
+1. Run `pnpm install`
 1. [Create your own Github SSO Provider](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app)
    - Follow the above instructions
    - Auth callback URL should be `http://localhost:3000/api/auth/callback/github`
@@ -27,7 +51,7 @@ The GraphQL Product Builder allows for bespoke GraphQL schemas to be generated.
 1. Run `npx prisma db push` to sync your Prisma schema with your MySQL DB
 
 #### Start the dev server
-1. Run `npm run dev` to run a dev version of your application
+1. Run `pnpm dev` to run a dev version of your application
 
 ## Background
 
@@ -298,6 +322,9 @@ There are the following stacks:
 - Fargate Stack - Contains the Application load balanced Fargate service
 - Pipeline Stack - Contains resources required for the pipeline
 
+### `cypress`
+This directory contains the end-to-end testing spec. 
+
 ### `src/pages/`
 
 Contains the definitions for the routes for all the pages and the API endpoints.
@@ -318,12 +345,8 @@ Contains the global styles.
 
 Contains the jest tests.
 
-## Architecture Diagram
+# Appendix
 
-![Architecture Diagram](./documentation/ArchitectureDiagram.png)
+## Code Pipeline Screenshot
 
-The above diagram shows the System architecture diagram for the GPB. Infrastructure is defined in code using AWS CDK. There is an AWS Code Pipeline which has a web hook into the Github repo which will build and deploy any changes made in the Github repo. 
-
-Route 53 handles DNS, the VPC provides networking in the cloud, the application load balancer distributes requests across the Fargate tasks based on current utilization and Fargate can scale the number of tasks up and down depending on the load, however this feature is disabled for cost savings measures in this assignment. 
-
-In the private subnet, there is a MySQL RDS cluster which provides the application servers with the database. This database can be configured to be deployed to multi-availability zones, but this is disabled in this assignment for costs savings.
+![Code Pipeline](./documentation/AWSCodePipeline.png)
