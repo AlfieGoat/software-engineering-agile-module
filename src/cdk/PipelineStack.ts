@@ -14,13 +14,15 @@ export class PipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
+    const githubRepo = CodePipelineSource.gitHub(
+      "AlfieGoat/software-engineering-agile-module",
+      "mainline"
+    );
+
     const pipeline = new CodePipeline(this, "Pipeline", {
       pipelineName: "ProductBuilderPipeline",
       synth: new ShellStep("Synth", {
-        input: CodePipelineSource.gitHub(
-          "AlfieGoat/software-engineering-agile-module",
-          "mainline"
-        ),
+        input: githubRepo,
         env: {
           SKIP_ENV_VALIDATION: "1",
         },
@@ -36,10 +38,7 @@ export class PipelineStack extends Stack {
 
     betaStage.addPost(
       new ShellStep("Beta End To End Integration Tests", {
-        input: CodePipelineSource.gitHub(
-          "AlfieGoat/software-engineering-agile-module",
-          "mainline"
-        ),
+        input: githubRepo,
         env: {
           SKIP_ENV_VALIDATION: "1",
         },
@@ -55,10 +54,7 @@ export class PipelineStack extends Stack {
 
     prodStage.addPost(
       new ShellStep("Prod End To End Integration Tests", {
-        input: CodePipelineSource.gitHub(
-          "AlfieGoat/software-engineering-agile-module",
-          "mainline"
-        ),
+        input: githubRepo,
         env: {
           SKIP_ENV_VALIDATION: "1",
         },

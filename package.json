@@ -11,7 +11,7 @@
     "start": "next start",
     "synth": "cdk synth",
     "test": "jest --coverage",
-    "e2e": "cypress run -h --spec \"cypress/e2e/my-spec.cy.js\""
+    "e2e": "cypress run -h --spec \"cypress/e2e/full-e2e.cy.ts\""
   },
   "dependencies": {
     "@cloudscape-design/components": "^3.0.208",
