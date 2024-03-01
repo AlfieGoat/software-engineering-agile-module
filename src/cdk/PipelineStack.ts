@@ -28,16 +28,42 @@ export class PipelineStack extends Stack {
       }),
     });
 
-    const betaStage = new PipelineStage(this, "BetaStage", {
-      domainName: "beta.graphqlproductbuilder.co.uk",
-    });
+    const betaStage = pipeline.addStage(
+      new PipelineStage(this, "BetaStage", {
+        domainName: "beta.graphqlproductbuilder.co.uk",
+      })
+    );
 
-    pipeline.addStage(betaStage);
+    betaStage.addPost(
+      new ShellStep("Beta End To End Integration Tests", {
+        input: CodePipelineSource.gitHub(
+          "AlfieGoat/software-engineering-agile-module",
+          "mainline"
+        ),
+        env: {
+          SKIP_ENV_VALIDATION: "1",
+        },
+        commands: ["npm install", "npm run e2e"],
+      })
+    );
 
-    const prodStage = new PipelineStage(this, "ProdStage", {
-      domainName: "prod.graphqlproductbuilder.co.uk",
-    });
+    const prodStage = pipeline.addStage(
+      new PipelineStage(this, "ProdStage", {
+        domainName: "prod.graphqlproductbuilder.co.uk",
+      })
+    );
 
-    pipeline.addStage(prodStage);
+    prodStage.addPost(
+      new ShellStep("Prod End To End Integration Tests", {
+        input: CodePipelineSource.gitHub(
+          "AlfieGoat/software-engineering-agile-module",
+          "mainline"
+        ),
+        env: {
+          SKIP_ENV_VALIDATION: "1",
+        },
+        commands: ["npm install", "npm run e2e"],
+      })
+    );
   }
 }

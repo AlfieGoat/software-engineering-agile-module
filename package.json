@@ -10,7 +10,8 @@
     "lint": "next lint",
     "start": "next start",
     "synth": "cdk synth",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "e2e": "cypress run -h --spec \"cypress/e2e/my-spec.cy.js\""
   },
   "dependencies": {
     "@cloudscape-design/components": "^3.0.208",
