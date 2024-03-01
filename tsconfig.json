@@ -28,7 +28,8 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.cjs",
-    "**/*.mjs"
+    "**/*.mjs",
+    "cypress/e2e/full-e2e.cy.ts"
   ],
   "exclude": ["node_modules", "cdk.out"]
 }

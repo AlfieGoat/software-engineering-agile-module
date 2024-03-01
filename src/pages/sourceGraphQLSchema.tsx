@@ -116,14 +116,17 @@ function UpdateSchemaPopup({
   const updateSchemaMutation = api.sourceGraphQLSchema.create.useMutation();
 
   return (
-    <div className="absolute top-1/2 left-1/2 z-10 w-1/2 -translate-x-1/2 -translate-y-1/2 transform">
+    <div className="absolute left-1/2 top-1/2 z-10 w-1/2 -translate-x-1/2 -translate-y-1/2 transform">
       <Container
         header={
           <Header
             variant="h2"
             description="Use this to update the source of truth schema."
             actions={
-              <div className="flex space-x-4">
+              <div
+                className="flex space-x-4"
+                data-test="source-graphql-update-button"
+              >
                 <Button
                   variant="primary"
                   onClick={async () => {

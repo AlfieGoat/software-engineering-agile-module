@@ -60,6 +60,7 @@ const GraphQLSubsetPopup = (
           actions={
             <div className="flex space-x-4">
               <Button
+                data-test="CreateSubset"
                 onClick={() =>
                   onSubmit(
                     formData,

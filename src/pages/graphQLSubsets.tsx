@@ -55,7 +55,7 @@ const CARD_DEFINITION: CardsProps.CardDefinition<Item> = {
       id: "schema",
       header: "Schema",
       content: (e: GraphQLSubset) => (
-        <div className="whitespace-pre-wrap">{e.graphQLSchema}</div>
+        <div className="whitespace-pre-wrap" data-test="schemaContent">{e.graphQLSchema}</div>
       ),
     },
   ],

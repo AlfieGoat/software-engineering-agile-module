@@ -1,6 +1,6 @@
 export const Content = {
   Create: {
-    headingText: "Create Customer",
+    headingText: "Create customer",
     buttonText: "Create",
   },
   Edit: {

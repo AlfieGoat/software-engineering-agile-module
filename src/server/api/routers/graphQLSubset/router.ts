@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { createTRPCRouter, protectedAdminProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, protectedAdminProcedure, protectedProcedure } from "~/server/api/trpc";
 import updateProduct from "../product/updateProduct";
 import { validateAndParseGraphQLSchema } from "./validateAndParseGraphQLSchema";
 
@@ -39,7 +39,7 @@ export const graphQLSubsetRouter = createTRPCRouter({
       return subset;
     }),
 
-  getById: protectedAdminProcedure
+  getById: protectedProcedure
     .input(z.object({ graphQLSubsetId: z.string() }))
     .query(async ({ ctx, input }) => {
       const graphQLSubset = await ctx.prisma.graphQLSubset.findUnique({
@@ -49,7 +49,7 @@ export const graphQLSubsetRouter = createTRPCRouter({
       return graphQLSubset;
     }),
 
-  getAll: protectedAdminProcedure
+  getAll: protectedProcedure
     .input(
       z.object({
         limit: z.number().min(1).max(MAX_PAGE_SIZE).nullish(),

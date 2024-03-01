@@ -39,7 +39,7 @@ const Index = () => {
           <p className="mb-8 text-center text-lg font-normal text-gray-500 dark:text-gray-400 sm:px-16 lg:text-xl xl:px-48">
             {PARAGRAPH_DESCRIPTION}
           </p>
-          <div className="flex space-x-4">
+          <div className="flex space-x-4" data-test="main-page-links">
             {PAGES.filter((page) => {
               if (!currentRole) return false;
               return page.role.includes(currentRole);
