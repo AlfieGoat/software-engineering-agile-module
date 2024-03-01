@@ -3,6 +3,7 @@
 The GraphQL Product Builder allows for bespoke GraphQL schema subsets to be generated.
 
 Deployments of this application are accessible for easy marking:
+
 - https://beta.graphqlproductbuilder.co.uk
 - https://prod.graphqlproductbuilder.co.uk
 
@@ -12,9 +13,9 @@ Deployments of this application are accessible for easy marking:
 
 ![Architecture Diagram](./documentation/ArchitectureDiagram.png)
 
-The above diagram shows the System architecture diagram for the GPB. Infrastructure is defined in code using AWS CDK in the `src/cdk` folder. 
+The above diagram shows the System architecture diagram for the GPB. Infrastructure is defined in code using AWS CDK in the `src/cdk` folder.
 
-Route 53 handles DNS, the VPC provides networking in the cloud, the application load balancer distributes requests across the Fargate tasks based on current utilization and Fargate can scale the number of tasks up and down depending on the load, however this feature is disabled for cost savings measures in this assignment. 
+Route 53 handles DNS, the VPC provides networking in the cloud, the application load balancer distributes requests across the Fargate tasks based on current utilization and Fargate can scale the number of tasks up and down depending on the load, however this feature is disabled for cost savings measures in this assignment.
 
 In the private subnet, there is a MySQL RDS cluster which provides the application servers with the database. This database can be configured to be deployed to multi-availability zones, but this is disabled in this assignment for costs savings.
 
@@ -26,18 +27,54 @@ There is an AWS Code Pipeline which has a web hook from the Github repo. This wi
 
 The deployment stages make use of Cypress for end-to-end integration tests which tests the functionality of the website. This test works by first deploying to the Beta environment, then once the deployment has succeeded, the end-to-end integration tests will run against the live beta deployment. These tests ensure that regressions aren't introduced and functionality is maintained across all of the pages.
 
+## Metrics and Logging
+
+Metrics and logs are captured in multiple places
+
+### AWS Application Load Balancer
+
+The AWS Application Load Balancer captures extensive metrics which can be seen here:
+
+[AWS Application Load Balancer](AWSApplicationLoadBalancer.png)
+
+### Application Logs
+
+Although the Application Load Balancer provides extensive metrics which can be used to alarm on, application logs provide a deeper look at individual requests.
+
+These logs are picked up by the [`AWS logs driver`](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_awslogs.html) and logged into [AWS CloudWatch](https://aws.amazon.com/cloudwatch/), which allows for log querying and management.
+
+All requests to the API routes are logged and include the following information:
+
+- HTTP Request Method
+- Request URL
+- Request Body
+- User Agent
+- Response Code
+- Their User ID if they are logged in
+
+These logs are captured from the [global API middleware](./src/pages/api/trpc/[trpc].ts) for the generic attributes and the user id is captured in the [authenticated route middleware](./src/server/api/trpc.ts).
+
+### Application Errors
+
+Errors are captured in different places:
+
+- Whenever an unauthorized request comes in, the server [logs the unauthorized request](./src/server/api/trpc.ts) and a 401 HTTP response code is returned to the user.
+- Whenever request parameters don't match the schema for the route (including additional constraints such as string length requirements or regex validation), a 400 status code is returned and an error is logged ([example router](src/server/api/routers/customers/router.ts)).
+- Whenever there is a database query error, this is logged by the [Prisma client](src/server/db.ts).
+
 ## Bootstrapping
 
 ### Pre-requisites
 
-- PNPM must be installed 
+- PNPM must be installed
 - Node must be installed
 - You must have a MySQL instance running
 
 ### Steps
 
 #### One-time setup
-1. Clone this Repo 
+
+1. Clone this Repo
 1. Run `pnpm install`
 1. [Create your own Github SSO Provider](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app)
    - Follow the above instructions
@@ -51,6 +88,7 @@ The deployment stages make use of Cypress for end-to-end integration tests which
 1. Run `npx prisma db push` to sync your Prisma schema with your MySQL DB
 
 #### Start the dev server
+
 1. Run `pnpm dev` to run a dev version of your application
 
 ## Background
@@ -99,9 +137,9 @@ This may return data in the following format:
 
 Monetizing APIs is not a new concept, but monetizing GraphQL APIs is a more novel concept.
 
-Imagine you have a GraphQL API within your organization and you want to monetize your API by enabling third parties to have enterprise access to your API. How would you do this? Well, you can setup a GraphQL endpoint, enter a contract with the 3rd party, exchange money and provide them with access to your API. 
+Imagine you have a GraphQL API within your organization and you want to monetize your API by enabling third parties to have enterprise access to your API. How would you do this? Well, you can setup a GraphQL endpoint, enter a contract with the 3rd party, exchange money and provide them with access to your API.
 
-But there's one main problem with this - By exposing your whole GraphQL Endpoint, there is only one single GraphQL schema that is being given to every customer. 
+But there's one main problem with this - By exposing your whole GraphQL Endpoint, there is only one single GraphQL schema that is being given to every customer.
 
 Think about the following business requirements:
 
@@ -115,53 +153,55 @@ Imagine you work at a Twitter and you have a GraphQL API that provides informati
 
 ```graphql
 type Tweet {
-    id: ID!
-    body: String
-    date: Date
-    Author: User
-    Stats: Stat
+  id: ID!
+  body: String
+  date: Date
+  Author: User
+  Stats: Stat
 }
 
 type User {
-    id: ID!
-    username: String
-    firstName: String
-    lastName: String
-    fullName: String
-    avatar_Url: Url
+  id: ID!
+  username: String
+  firstName: String
+  lastName: String
+  fullName: String
+  avatar_Url: Url
 }
 
 type Stat {
-    views: Int
-    likes: Int
-    retweets: Int
-    responses: Int
+  views: Int
+  likes: Int
+  retweets: Int
+  responses: Int
 }
 
 scalar Url
 scalar Date
 
 type Query {
-    Tweet(id: ID!): Tweet
-    Tweets(limit: Int, skip: Int, sort_field: String, sort_order: String): [Tweet]
-    User(id: ID!): User
+  Tweet(id: ID!): Tweet
+  Tweets(limit: Int, skip: Int, sort_field: String, sort_order: String): [Tweet]
+  User(id: ID!): User
 }
 ```
 
-The GraphQL Product Builder will be used by two job families: 
+The GraphQL Product Builder will be used by two job families:
+
 - Software Development Engineers (SDE) who are familiar with the underlying Twitter GraphQL schema.
 - Sales Representatives (SR) who are selling the Twitter API to customers.
 
-The terms of a new sale have been negotiated and the sale has just been made, so access to the API needs to be provided to the customer. 
+The terms of a new sale have been negotiated and the sale has just been made, so access to the API needs to be provided to the customer.
 
 The negotiations have stated that the customer is allowed to access **Tweet** information including **Tweet Statistics**, but **not data about Users** (additional monetary compensation would be required for a customer to onboard with User data).
 
 Based on this information we can onboard the customer onto the GraphQL API. But how do we do this?
 
 ### Step 1: Add the schema to the GraphQL Product Builder
+
 Let's add the customer to the database.
 
-Navigate to https://graphqlproductbuilder.co.uk/sourceGraphQLSchema and we can add the exhaustive schema for our GraphQL API. This is needed because all of the GraphQL Subsets are based on this *source of truth schema*.
+Navigate to https://graphqlproductbuilder.co.uk/sourceGraphQLSchema and we can add the exhaustive schema for our GraphQL API. This is needed because all of the GraphQL Subsets are based on this _source of truth schema_.
 
 ![The Source GraphQL Schema page with the schema filled in](./documentation/SourceGraphQLSchemaWithSchema.png)
 
@@ -195,7 +235,7 @@ Now we need to create the actual product that comprises of the two GraphQL Subse
   - Call it the Tweet and Statistics Product
   - Add a description
   - Select the correct GraphQL subsets
-  - Press Create! 
+  - Press Create!
 
 **Creation of The Tweet and Statistics Product**
 
@@ -223,6 +263,7 @@ Now we need to create the actual product that comprises of the two GraphQL Subse
 ![Final GraphQL Customers Page](./documentation/GraphQLProductsPage.png)
 
 ### Recap
+
 The below diagram shows the complete flow of how customers gain access to a product, a product is a composition of GraphQL Subsets and how GraphQL Subsets are constructed from a chunk of the GraphQL Source Schema, as described in the steps above.
 
 ![Entity Diagram](./documentation/EntityDiagram.png)
@@ -246,9 +287,10 @@ As mentioned above, this application needs integrating with a GraphQL Gateway to
 ### Locking down the application
 
 If you want to deploy this application for your GraphQL Gateway, you will need to lock this application down to only those who need it. You can do this by:
+
 - Creating a NextJS middleware which checks that the requesting user is logged in and is allowlisted to access the website. This is a front end check.
 - Creating and using a new tRPC procedure which checks if the user is logged in and allowlisted to access the queries and mutations specified.
-- Remove the demonstrative user toggle switch 
+- Remove the demonstrative user toggle switch
 
 ### Automatic schema ingestion
 
@@ -259,6 +301,7 @@ Whenever the underlying GraphQL schema changes, we don't want to have to manuall
 Whenever you want to make a change to the GraphQL schema of a subset, I want integration testing to be performed.
 
 GraphQL Products are made up of many GraphQL Subsets by composing their GraphQL schemas into a single schema. If I make a change to one of the GraphQL subsets, it will cause the GraphQL Products to have a different schema. I want to ensure that the new resulting GraphQL Product schema is valid by the following checks:
+
 #### Statically check it is a valid schema
 
 This can be done by parsing the schema and checking there are no errors when parsing.
@@ -272,7 +315,7 @@ This can be done by running it through the GraphQL schema diffing tool which fin
 This could work by:
 
 - GraphQL Subset test:
-  - Each GraphQL subset has its own integration test query. 
+  - Each GraphQL subset has its own integration test query.
   - The GraphQL Product Builder will call the GraphQL Gateway with the query and a special header that overrides the schema with the schema of the GraphQL Subset.
   - The GraphQL Product Builder will receive the response
   - The GraphQL Product Builder will check that the response is a 200 and contains no errors.
@@ -280,12 +323,12 @@ This could work by:
   - If the GraphQL subset integration checks pass, it will move on to the GraphQL Product tests
 - GraphQL Product Tests:
   - For each GraphQL Product that the edited GraphQL Subset is associated with:
-     - The GraphQL Product Builder will calculate the new GraphQL schema for each product
-     - For each GraphLQ Subset of each GraphQL Product
-        - The GraphQL Product Builder will call the GraphQL Gateway with the GraphQL Subset integration query and a special header that overrides the schema with the schema of the new GraphQL product schema.
-          - The GraphQL Product Builder will receive the response
-          - The GraphQL Product Builder will check that the response is a 200 and contains no errors.
-          - The GraphQL Product Builder will check that the response contains data that is of the correct schema type.
+    - The GraphQL Product Builder will calculate the new GraphQL schema for each product
+    - For each GraphLQ Subset of each GraphQL Product
+      - The GraphQL Product Builder will call the GraphQL Gateway with the GraphQL Subset integration query and a special header that overrides the schema with the schema of the new GraphQL product schema.
+        - The GraphQL Product Builder will receive the response
+        - The GraphQL Product Builder will check that the response is a 200 and contains no errors.
+        - The GraphQL Product Builder will check that the response contains data that is of the correct schema type.
   - If every single GraphQL query succeeds and matches the correct shape, the test will pass and the edited schemas will be committed to the database
 
 This same approach should be applied when updating a product to have different GraphQL Subsets.
@@ -317,13 +360,14 @@ There are the following stacks:
 
 - Hosted Zone Stack - Contains the Hosted Zone required for DNS
 - VPC Stack - Contains the Virtual Private Cloud infrastructure to provide networking in the cloud.
-- Docker Image Stack - Builds the docker image 
+- Docker Image Stack - Builds the docker image
 - Database Stack - Contains the RDS instance
 - Fargate Stack - Contains the Application load balanced Fargate service
 - Pipeline Stack - Contains resources required for the pipeline
 
 ### `cypress`
-This directory contains the end-to-end testing spec. 
+
+This directory contains the end-to-end testing spec.
 
 ### `src/pages/`
 

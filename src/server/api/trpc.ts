@@ -1,8 +1,4 @@
 /**
- * YOU PROBABLY DON'T NEED TO EDIT THIS FILE, UNLESS:
- * 1. You want to modify request context (see Part 1).
- * 2. You want to create a new middleware or type of procedure (see Part 3).
- *
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
@@ -101,6 +97,7 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   if (!ctx.session || !ctx.session.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+  console.log(`Authenticated user as '${ctx.session.user.id}'`);
   return next({
     ctx: {
       // infers the `session` as non-nullable
@@ -124,6 +121,7 @@ const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
   if (!ctx.session || !ctx.session.user || ctx.session.user.role !== "admin") {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+  console.log(`Authenticated user as '${ctx.session.user.id}'`);
   return next({
     ctx: {
       session: { ...ctx.session, user: ctx.session.user },
@@ -131,11 +129,10 @@ const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
   });
 });
 
-
 /**
  * Protected (authenticated) procedure for ADMINS only!
  *
- * If you want a query or mutation to ONLY be accessible to logged in users, use this. It verifies
+ * If you want a query or mutation to ONLY be accessible to logged in users who are admins, use this. It verifies
  * the session is valid and guarantees `ctx.session.user` is not null.
  *
  * @see https://trpc.io/docs/procedures
